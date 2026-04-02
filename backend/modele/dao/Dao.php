@@ -1,11 +1,13 @@
 <?php
+    namespace Backend\Modele\Dao;
+
     interface Dao{
 
-        public function findAll();
-        public function findById($id);
-        public function insert($donnee);
-        public function update($donnee);
-        public function delete($id);
+        public function findAll():array;
+        public function findById(mixed $id):?object;
+        public function insert(object $donnee):bool;
+        public function update(object $donnee):bool;
+        public function delete(mixed $id):bool;
         
     }
 ?>

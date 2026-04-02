@@ -1,7 +1,7 @@
 <?php
     namespace Backend\Modele;
 
-    class Utilise{
+    class UtiliseR{
         private int $Id_Ustensiles;
         private int $Id_Recette;
         private float $quantite;

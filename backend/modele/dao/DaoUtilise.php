@@ -3,9 +3,9 @@
 
     use Backend\Modele\Dao\Bd\ConnexionBD;
     use PDO;
-    use Backend\Modele\Contient;
+    use Backend\Modele\Utilise;
 
-    class DaoContient implements Dao{
+    class DaoUtilise implements Dao{
         private $connexion;
 
         public function __construct (){
@@ -13,23 +13,23 @@
         }
 
         public function findAll():array{
-            $req = $this->connexion->query('SELECT * FROM Contient;');
+            $req = $this->connexion->query('SELECT * FROM Utilise;');
             $res = $req->fetchAll(PDO::FETCH_ASSOC);
-            $contients = array();
+            $utilises = array();
             foreach ( $res as $raw){
-                $contients[] = $this->creerInstance($raw);
+                $utilises[] = $this->creerInstance($raw);
             }
-            return $contients;
+            return $utilises;
         }
 
-        public function findById($id):?Contient{
+        public function findById($id):?Utilise{
             $req = $this->connexion->prepare('
-                SELECT * FROM Contient 
-                    where Id_Ingredient = :Id_Ingredient 
+                SELECT * FROM Utilise 
+                    where Id_Ustensiles = :Id_Ustensiles 
                     and Id_Recette = :Id_Recette 
                     and numero = :numero;
             ');
-            $req->bindParam(':Id_Ingredient', $id[0]);
+            $req->bindParam(':Id_Ustensiles', $id[0]);
             $req->bindParam(':Id_Recette', $id[1]);
             $req->bindParam(':numero', $id[2]);
             $req->execute();
@@ -39,60 +39,57 @@
 
         public function findByIdRecette($id):array{
             $req = $this->connexion->prepare('
-                SELECT * FROM Contient 
+                SELECT * FROM Utilise 
                     where Id_Recette = :Id_Recette;
             ');
             $req->bindParam(':Id_Recette', $id);
             $req->execute();
             $res = $req->fetchAll(PDO::FETCH_ASSOC);
-            $contients = array();
+            $utilises = array();
             foreach ($res as $raw){
-                $contients[] = $this->creerInstance($raw);
+                $utilises[] = $this->creerInstance($raw);
             }
-            return $contients;
+            return $utilises;
         }
 
         public function insert($donnee):bool{
-            $req = $this->connexion->prepare('INSERT INTO Contient (Id_Ingredient, Id_Recette, numero, quantite, unite) VALUES (:Id_Ingredient, :Id_Recette, :numero, :quantite, :unite);');
-            $req->bindParam(':Id_Ingredient',$donnee->getIdIngredient());
+            $req = $this->connexion->prepare('INSERT INTO Utilise (Id_Ustensiles, Id_Recette, numero, quantite) VALUES (:Id_Ustensiles, :Id_Recette, :numero, :quantite);');
+            $req->bindParam(':Id_Ustensiles',$donnee->getIdUstensiles());
             $req->bindParam(':Id_Recette',$donnee->getIdRecette());
             $req->bindParam(':numero',$donnee->getNumero());
             $req->bindParam(':quantite',$donnee->getQuantite());
-            $req->bindParam(':unite',$donnee->getUnite());
             return $req->execute();
         }
 
         public function update($donnee):bool{
-            $req = $this->connexion->prepare('UPDATE Contient 
-                SET quantite=:quantite, unite=:unite
-                where Id_Ingredient = :Id_Ingredient and Id_Recette = :Id_Recette and numero = :numero;');
-            $req->bindParam(':Id_Ingredient',$donnee->getIdIngredient());
+            $req = $this->connexion->prepare('UPDATE Utilise 
+                SET quantite=:quantite
+                where Id_Ustensiles = :Id_Ustensiles and Id_Recette = :Id_Recette and numero = :numero;');
+            $req->bindParam(':Id_Ustensiles',$donnee->getIdUstensiles());
             $req->bindParam(':Id_Recette',$donnee->getIdRecette());
             $req->bindParam(':numero',$donnee->getNumero());
             $req->bindParam(':quantite',$donnee->getQuantite());
-            $req->bindParam(':unite',$donnee->getUnite());
             return $req->execute();
         }
 
         public function delete($id):bool{
-            $req = $this->connexion->prepare('DELETE FROM Contient where Id_Ingredient = :Id_Ingredient and Id_Recette = :Id_Recette and numero = :numero;');
-            $req->bindParam(':Id_Ingredient', $id[0]);
+            $req = $this->connexion->prepare('DELETE FROM Utilise where Id_Ustensiles = :Id_Ustensiles and Id_Recette = :Id_Recette and numero = :numero;');
+            $req->bindParam(':Id_Ustensiles', $id[0]);
             $req->bindParam(':Id_Recette', $id[1]);
             $req->bindParam(':numero', $id[2]);
             return $req->execute();
         }
 
-        private function creerInstance($raw):?Contient{
+        private function creerInstance($raw):?Utilise{
             if (!$raw){
                 return null;
             }
-            $Id_Ingredient = $raw['Id_Ingredient'];
+            $Id_Ustensiles = $raw['Id_Ustensiles'];
             $Id_Recette = $raw['Id_Recette'];
             $numero = $raw['numero'];
             $quantite = $raw['quantite'];
-            $unite = $raw['unite'];
-            $contient = new Contient($Id_Ingredient,$Id_Recette,$numero,$quantite,$unite);
-            return $contient;
+            $utilise = new Utilise($Id_Ustensiles,$Id_Recette,$numero,$quantite);
+            return $utilise;
         }
     }
 ?>

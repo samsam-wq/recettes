@@ -1,12 +1,18 @@
 <?php
+    namespace Backend\Modele\Dao;
+
+    use Backend\Modele\Dao\Bd\ConnexionBD;
+    use PDO;
+    use Backend\Modele\Ingredient;
+
     class DaoIngredient implements Dao{
         private $connexion;
 
         public function __construct (){
-            $this->connexion=ConnexionBD::getConnexion();
+            $this->connexion=ConnexionBD::getInstance()->pdo();
         }
 
-        public function findAll(){
+        public function findAll():array{
             $req = $this->connexion->query('SELECT * FROM Ingredient;');
             $res = $req->fetchAll(PDO::FETCH_ASSOC);
             $ingredients = array();
@@ -16,7 +22,7 @@
             return $ingredients;
         }
 
-        public function findById($id){
+        public function findById($id):?Ingredient{
             $req = $this->connexion->prepare('SELECT * FROM Ingredient where Id_Ingredient = :id;');
             $req->bindParam(':id', $id);
             $req->execute();
@@ -24,15 +30,15 @@
             return $this->creerInstance($res);
         }
 
-        public function insert($donnee){
+        public function insert($donnee):bool{
             $req = $this->connexion->prepare('INSERT INTO Ingredient (prix, image, nom) VALUES (:prix, :image, :nom);');
             $req->bindParam(':prix',$donnee->getPrix());
             $req->bindParam(':image',$donnee->getImage());
             $req->bindParam(':nom',$donnee->getNom());
-            $req->execute();
+            return $req->execute();
         }
 
-        public function update($donnee){
+        public function update($donnee):bool{
             $req = $this->connexion->prepare('UPDATE Ingredient 
                 SET prix=:prix, image=:image, nom=:nom
                 where Id_Ingredient = :id;');
@@ -40,16 +46,16 @@
             $req->bindParam(':prix',$donnee->getPrix());
             $req->bindParam(':image',$donnee->getImage());
             $req->bindParam(':nom',$donnee->getNom());
-            $req->execute();
+            return $req->execute();
         }
 
-        public function delete($id){
+        public function delete($id):bool{
             $req = $this->connexion->prepare('DELETE FROM Ingredient where Id_Ingredient = :id;');
             $req->bindParam(':id',$id);
-            $req->execute();
+            return $req->execute();
         }
 
-        private function creerInstance($raw){
+        private function creerInstance($raw):?Ingredient{
             if (!$raw){
                 return null;
             }
