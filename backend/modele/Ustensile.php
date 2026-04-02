@@ -1,24 +1,26 @@
 <?php
-    class Ustensile{
-        private $Id_Ustensiles;
-        private $nom;
+    namespace Backend\Modele;
 
-        public function __construct ($Id_Ustensiles,$nom){
+    class Ustensile{
+        private int $Id_Ustensiles;
+        private string $nom;
+
+        public function __construct (int $Id_Ustensiles,string $nom){
             $this->Id_Ustensiles=$Id_Ustensiles;
             $this->nom=$nom;
         }
 
-        public function getIdUstensiles(){
+        public function getIdUstensiles():int{
             return $this->Id_Ustensiles ;
         }
-        public function getNom(){
+        public function getNom():string{
             return $this->nom ;
         }
 
-        public function setIdUstensiles($Id_Ustensiles){
+        public function setIdUstensiles(int $Id_Ustensiles):void{
             $this->Id_Ustensiles=$Id_Ustensiles;
         }
-        public function setNom($nom){
+        public function setNom(string $nom):void{
             $this->nom=$nom;
         }
     }

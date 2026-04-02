@@ -15,10 +15,10 @@ class DatabaseHandler {
 
     private function __construct(){
         try{
-            $this->server = "mysql-lafrontt.alwaysdata.net";
-            $this->db = "lafrontt_apiauth";
-            $this->login = "lafrontt_requetes_api";
-            $this->mdp = "\$iutinfo";
+            $this->server = "127.0.0.1";
+            $this->db = "Recettes_Utilisateurs";
+            $this->login = "root";
+            $this->mdp = "";
             $this->linkpdo=new PDO("mysql:host=".$this->server.";dbname=".$this->db,$this->login,$this->mdp);
         }catch(Exception $e){
             die("Erreur : ".$e->getMessage());

@@ -1,48 +1,42 @@
 <?php
-    class Etape{//Id_Etape, titre, contenu, numero, Id_Recette
-        private $Id_Etape;
-        private $titre;
-        private $contenu;
-        private $numero;
-        private $Id_Recette;
+    namespace Backend\Modele;
 
-        public function __construct ($Id_Etape,$titre,$contenu,$numero,$Id_Recette){
-            $this->Id_Etape=$Id_Etape;
+    class Etape{
+        private string $titre;
+        private string $contenu;
+        private int $numero;
+        private int $Id_Recette;
+
+        public function __construct (string $titre,string $contenu,int $numero,int $Id_Recette){
             $this->titre=$titre;
             $this->contenu=$contenu;
             $this->numero=$numero;
             $this->Id_Recette=$Id_Recette;
         }
 
-        public function getIdEtape(){
-            return $this->Id_Etape ;
-        }
-        public function getTitre(){
+        public function getTitre():string{
             return $this->titre ;
         }
-        public function getContenu(){
+        public function getContenu():string{
             return $this->contenu ;
         }
-        public function getNumero(){
+        public function getNumero():int{
             return $this->numero ;
         }
-        public function getIdRecette(){
+        public function getIdRecette():int{
             return $this->Id_Recette ;
         }
 
-        public function setIdEtape($Id_Etape){
-            $this->Id_Etape=$Id_Etape;
-        }
-        public function setTitre($titre){
+        public function setTitre(string $titre):void{
             $this->titre=$titre;
         }
-        public function setContenu($contenu){
+        public function setContenu(string $contenu):void{
             $this->contenu=$contenu;
         }
-        public function setNumero($numero){
+        public function setNumero(int $numero):void{
             $this->numero=$numero;
         }
-        public function setIdRecette($Id_Recette){
+        public function setIdRecette(int $Id_Recette):void{
             $this->Id_Recette=$Id_Recette;
         }
     }

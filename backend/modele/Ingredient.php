@@ -1,40 +1,42 @@
 <?php
-    class Ingredient{
-        private $Id_Ingredient;
-        private $nom;
-        private $prix;
-        private $image;
+    namespace Backend\Modele;
 
-        public function __construct ($Id_Ingredient,$nom,$prix,$image){
+    class Ingredient{
+        private int $Id_Ingredient;
+        private string $nom;
+        private float $prix;
+        private string $image;
+
+        public function __construct (int $Id_Ingredient,string $nom,float $prix,string $image){
             $this->Id_Ingredient=$Id_Ingredient;
             $this->nom=$nom;
             $this->prix=$prix;
             $this->image=$image;
         }
 
-        public function getIdIngredient(){
+        public function getIdIngredient():int{
             return $this->Id_Ingredient ;
         }
-        public function getNom(){
+        public function getNom():string{
             return $this->nom ;
         }
-        public function getPrix(){
+        public function getPrix():float{
             return $this->prix ;
         }
-        public function getImage(){
+        public function getImage():string{
             return $this->image ;
         }
 
-        public function setIdIngredient($Id_Ingredient){
+        public function setIdIngredient(int $Id_Ingredient):void{
             $this->Id_Ingredient=$Id_Ingredient;
         }
-        public function setNom($nom){
+        public function setNom(string $nom):void{
             $this->nom=$nom;
         }
-        public function setPrix($prix){
+        public function setPrix(float $prix):void{
             $this->prix=$prix;
         }
-        public function setImage($image){
+        public function setImage(string $image):void{
             $this->image=$image;
         }
     }

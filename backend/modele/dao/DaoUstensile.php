@@ -1,4 +1,7 @@
 <?php
+    namespace Backend\Modele\Dao;
+
+    
     class DaoUstensile implements Dao{
         private $connexion;
 

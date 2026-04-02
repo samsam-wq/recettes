@@ -1,49 +1,66 @@
 <?php
-    class Recette{
-        private $Id_recette;
-        private $nom;
-        private $duree;
-        private $categorie;
-        private $image;
+    namespace Backend\Modele;
 
-        public function __construct ($Id_recette,$nom,$duree,$categorie,$image){
+    class Recette{
+        private int $Id_recette;
+        private string $nom;
+        private int $duree;
+        private string $categorie;
+        private string $image;
+        private int $groupe;
+
+        public function __construct (
+            int $Id_recette,
+            string $nom,
+            int $duree,
+            string $categorie,
+            string $image,
+            int $groupe)
+        {
             $this->Id_recette=$Id_recette;
             $this->nom=$nom;
             $this->duree=$duree;
             $this->categorie=$categorie;
             $this->image=$image;
+            $this->groupe=$groupe;
         }
 
-        public function getIdRecette(){
+        public function getIdRecette():int{
             return $this->Id_recette ;
         }
-        public function getNom(){
+        public function getNom():string{
             return $this->nom ;
         }
-        public function getDuree(){
+        public function getDuree():int{
             return $this->duree ;
         }
-        public function getCategorie(){
+        public function getCategorie():string{
             return $this->categorie ;
         }
-        public function getImage(){
+        public function getImage():string{
             return $this->image ;
         }
+        public function getGroupe():int{
+            return $this->groupe ;
+        }
 
-        public function setIdRecette($Id_recette){
+        public function setIdRecette(int $Id_recette):void{
             $this->Id_recette=$Id_recette;
         }
-        public function setNom($nom){
+        public function setNom(string $nom):void{
             $this->nom=$nom;
         }
-        public function setDuree($duree){
+        public function setDuree(int $duree):void{
             $this->duree=$duree;
         }
-        public function setCategorie($categorie){
+        public function setCategorie(string $categorie):void{
             $this->categorie=$categorie;
         }
-        public function setImage($image){
+        public function setImage(string $image):void{
             $this->image=$image;
+        }
+        public function setGroupe(int $groupe):void{
+            $this->groupe=$groupe;
         }
     }
 ?>
