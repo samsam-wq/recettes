@@ -38,6 +38,6 @@ class UtilisateurDAO {
         $req->bindParam(':pwd', $pwd);
         $req->execute();
         $res = $req->fetch($this->database->pdo()::FETCH_ASSOC);
-        return new Utilisateur($res['login'],$res['password'],$res['role']);
+        return new Utilisateur($res['login'],$res['password'],$res['groupe']);
     }
 }

@@ -12,9 +12,9 @@ create table utilisateur (
                         constraint pk_utilisateur primary key (utilisateur_id)
 );
 
-insert into utilisateur (login ,password ,role) 
+insert into utilisateur (login ,password ,groupe) 
 values("Anna","!Anna",1);
-insert into utilisateur (login ,password ,role) 
+insert into utilisateur (login ,password ,groupe) 
 values("Sam","!Sam",1);
 
 commit;

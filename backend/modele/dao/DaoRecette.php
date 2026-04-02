@@ -1,15 +1,24 @@
 <?php
     namespace Backend\Modele\Dao;
 
+    use api\Modele\Joueur\RecetteCategorie;
     use Backend\Modele\Dao\Bd\ConnexionBD;
-    use PDO;
     use Backend\Modele\Recette;
+    use PDO;
 
     class DaoRecette implements Dao{
-        private $connexion;
+        private static ?DaoRecette $instance = null;
+        private readonly PDO $connexion;
 
-        public function __construct (){
-            $this->connexion=ConnexionBD::getInstance()->pdo();
+        private function __construct() {
+            $this->connexion = ConnexionBD::getInstance()->pdo();
+        }
+
+        public static function getInstance(): DaoRecette {
+            if (self::$instance == null) {
+                self::$instance = new DaoRecette();
+            }
+            return self::$instance;
         }
 
         public function findAll():array{
@@ -25,6 +34,38 @@
         public function findById($id):?Recette{
             $req = $this->connexion->prepare('SELECT * FROM Recette where Id_Recette = :id;');
             $req->bindParam(':id', $id);
+            $req->execute();
+            $res = $req->fetch(PDO::FETCH_ASSOC);
+            return $this->creerInstance($res);
+        }
+
+        public function findByCategorie(RecetteCategorie $categorie):?Recette{
+            $req = $this->connexion->prepare('SELECT * FROM Recette where categorie = :categorie;');
+            $req->bindParam(':categorie', $categorie->name);
+            $req->execute();
+            $res = $req->fetch(PDO::FETCH_ASSOC);
+            return $this->creerInstance($res);
+        }
+
+        public function findByGroupe(int $groupe):?Recette{
+            $req = $this->connexion->prepare('SELECT * FROM Recette where groupe = :groupe;');
+            $req->bindParam(':groupe', $groupe);
+            $req->execute();
+            $res = $req->fetch(PDO::FETCH_ASSOC);
+            return $this->creerInstance($res);
+        }
+
+        public function filterByDuree(int $duree):?Recette{
+            $req = $this->connexion->prepare('SELECT * FROM Recette where duree <= :duree;');
+            $req->bindParam(':duree', $duree);
+            $req->execute();
+            $res = $req->fetch(PDO::FETCH_ASSOC);
+            return $this->creerInstance($res);
+        }
+
+        public function findByNom(string $nom):?Recette{
+            $req = $this->connexion->prepare('SELECT * FROM Recette where nom LIKE %:nom%;');
+            $req->bindParam(':nom', $nom);
             $req->execute();
             $res = $req->fetch(PDO::FETCH_ASSOC);
             return $this->creerInstance($res);
