@@ -2,93 +2,115 @@
 
 namespace frontend\Vue\Component;
 
+/**
+ * Composant Formulaire
+ * Génère des formulaires HTML avec le design Nos Recettes.
+ * API identique à l'originale — aucune rupture de compatibilité.
+ */
 class Formulaire {
-    private $formulaire;
-    //Constructeur
-    public function __construct($returnName) {
-        $this->formulaire = '<div class="container"><form action="'.$returnName.'" method=post>';
-    }
-    //Ajouter un text à remplir
-    public function setText($description, $name, $placeholder = "", $value = "") {
-        $this->formulaire .= '<div class="row">
-                                <div class="col-20">
-                                    <label>'.$description.'</label>
-                                </div>
-                                <div class="col-80">
-                                    <input type=text value="'.$value.'" name="'.$name.'" placeholder="'.$placeholder.'">
-                                </div>
-                            </div>';
+
+    private string $formulaire;
+
+    public function __construct(string $returnName) {
+        $this->formulaire = '<div class="container"><form action="' . htmlspecialchars($returnName) . '" method="POST">';
     }
 
-    public function addHiddenInput($name, $value) {
-        $this->formulaire .= '<input type=hidden value="'.$value.'" name="'.$name.'">';
+    /** Champ texte */
+    public function setText(string $description, string $name, string $placeholder = '', string $value = ''): void {
+        $this->formulaire .= '
+        <div class="row">
+            <label for="field-' . htmlspecialchars($name) . '">' . htmlspecialchars($description) . '</label>
+            <input type="text"
+                id="field-' . htmlspecialchars($name) . '"
+                name="' . htmlspecialchars($name) . '"
+                placeholder="' . htmlspecialchars($placeholder) . '"
+                value="' . htmlspecialchars($value) . '"
+            >
+        </div>';
     }
 
-    public function setDate($description, $name, $value = "") {
-        $this->formulaire .= '<div class="row">
-                                <div class="col-20">
-                                    <label>'.$description.'</label>
-                                </div>
-                                <div class="col-80">
-                                    <input type=date value="'.$value.'" name="'.$name.'">
-                                </div>
-                            </div>';
-    }
-    public function setDateTime($description, $name, string|null $min = null, $value = "") {
-        $this->formulaire .= "<div class=\"row\">
-                                <div class=\"col-20\">
-                                    <label>$description</label>
-                                </div>
-                                <div class=\"col-80\">
-                                    <input type=\"datetime-local\" value=\"$value\" name=\"$name\" min=\"$min\">
-                                </div>
-                            </div>";
+    /** Champ date */
+    public function setDate(string $description, string $name, string $value = ''): void {
+        $this->formulaire .= '
+        <div class="row">
+            <label for="field-' . htmlspecialchars($name) . '">' . htmlspecialchars($description) . '</label>
+            <input type="date"
+                id="field-' . htmlspecialchars($name) . '"
+                name="' . htmlspecialchars($name) . '"
+                value="' . htmlspecialchars($value) . '"
+            >
+        </div>';
     }
 
-    public function setSelect(string $description, array $values, string $name, string $SelectedValue = "") {
-        $this->formulaire .= '<div class="row">
-                                <div class="col-20">
-                                    <label>'.$description.'</label>
-                                </div>
-                                <div class="col-80">
-                                    <select name="'.$name.'">';
+    /** Champ datetime-local */
+    public function setDateTime(string $description, string $name, ?string $min = null, string $value = ''): void {
+        $minAttr = $min ? ' min="' . htmlspecialchars($min) . '"' : '';
+        $this->formulaire .= '
+        <div class="row">
+            <label for="field-' . htmlspecialchars($name) . '">' . htmlspecialchars($description) . '</label>
+            <input type="datetime-local"
+                id="field-' . htmlspecialchars($name) . '"
+                name="' . htmlspecialchars($name) . '"
+                value="' . htmlspecialchars($value) . '"' . $minAttr . '
+            >
+        </div>';
+    }
+
+    /** Champ select */
+    public function setSelect(string $description, array $values, string $name, string $selectedValue = ''): void {
+        $options = '';
         foreach ($values as $v) {
-            $this->formulaire .= "<option value=\"$v\" ".$this->addSelectedAttribute($v, $SelectedValue).">$v</option>";
-        }
-        $this->formulaire .= "</select>
-                                </div>
-                            </div>";
-    }
-
-    private function addSelectedAttribute($v, $SelectedValue) {
-        if ($v == $SelectedValue) {
-            return 'selected';
-        }
-    }
-
-    //Ajouter un bouton
-    public function addButton($type, $class, $name = "", $value = "") {
-        $this->formulaire .= '<div class="row" style="margin-top:20px;">
-                                <input class="'.$class.'" type="'.$type.'" value="'.$value.'" name="'.$name.'">
-                            </div>';
-    }
-
-    public function addTextArea(string $name, ?string $description = null, string $value = ""){
-        $this->formulaire .= '<div class="row">';
-        if($description !== null) {
-            $this->formulaire .= '
-                <div class="col-20">
-                    <label for="<?php echo $this->name; ?>"><?php echo $this->description; ?></label>
-                </div>
-            ';
+            $sel      = ($v == $selectedValue) ? ' selected' : '';
+            $options .= '<option value="' . htmlspecialchars($v) . '"' . $sel . '>' . htmlspecialchars($v) . '</option>';
         }
         $this->formulaire .= '
-                <div><textarea name="'.$name.'">'.$value.'</textarea></div>
-            ';
-        $this->formulaire .= '</div>';
+        <div class="row">
+            <label for="field-' . htmlspecialchars($name) . '">' . htmlspecialchars($description) . '</label>
+            <select id="field-' . htmlspecialchars($name) . '" name="' . htmlspecialchars($name) . '">
+                ' . $options . '
+            </select>
+        </div>';
     }
 
-    public function __toString() {
-        return $this->formulaire."</form></div>";
+    /** Champ textarea */
+    public function addTextArea(string $name, ?string $description = null, string $value = ''): void {
+        $labelHtml = $description
+            ? '<label for="field-' . htmlspecialchars($name) . '">' . htmlspecialchars($description) . '</label>'
+            : '';
+        $this->formulaire .= '
+        <div class="row' . ($description ? '' : ' row--no-label') . '">
+            ' . $labelHtml . '
+            <textarea id="field-' . htmlspecialchars($name) . '" name="' . htmlspecialchars($name) . '">'
+                . htmlspecialchars($value) .
+            '</textarea>
+        </div>';
+    }
+
+    /** Champ caché */
+    public function addHiddenInput(string $name, string $value): void {
+        $this->formulaire .= '<input type="hidden" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars($value) . '">';
+    }
+
+    /**
+     * Ajoute un bouton de soumission.
+     *
+     * @param string $type   'submit' | 'button' | 'reset'
+     * @param string $class  '' (primary), 'create', 'update', 'delete', 'largeSubmit'
+     * @param string $name   Attribut name
+     * @param string $value  Label du bouton
+     */
+    public function addButton(string $type, string $class, string $name = '', string $value = ''): void {
+        $this->formulaire .= '
+        <div class="row row--action" style="margin-top:8px;">
+            <input type="' . htmlspecialchars($type) . '"
+                class="' . htmlspecialchars($class) . '"
+                name="' . htmlspecialchars($name) . '"
+                value="' . htmlspecialchars($value) . '"
+            >
+        </div>';
+    }
+
+    public function __toString(): string {
+        return $this->formulaire . '</form></div>';
     }
 }

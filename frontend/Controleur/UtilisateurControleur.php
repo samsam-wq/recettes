@@ -6,7 +6,7 @@ use frontend\Service\ApiService;
 
 class UtilisateurControleur {
     private static ?UtilisateurControleur $instance = null;
-    private string $url = "https://lafrontt.alwaysdata.net/";
+    private string $url = "http://apiauth.test/";
     private ApiService $apiservice;
 
     private function __construct() {

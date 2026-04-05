@@ -1,5 +1,5 @@
 <?php
-    namespace Backend\Modele\Dao;
+    namespace backend\modele\dao;
 
     interface Dao{
 

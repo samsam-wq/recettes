@@ -1,9 +1,9 @@
 <?php
-    namespace Backend\Modele\Dao;
+    namespace backend\Modele\Dao;
 
-    use api\Modele\Joueur\RecetteCategorie;
-    use Backend\Modele\Dao\Bd\ConnexionBD;
-    use Backend\Modele\Recette;
+    use backend\modele\RecetteCategorie;
+    use backend\modele\dao\bd\ConnexionBD;
+    use backend\modele\Recette;
     use PDO;
 
     class DaoRecette implements Dao{
@@ -39,45 +39,33 @@
             return $this->creerInstance($res);
         }
 
-        public function findByCategorie(RecetteCategorie $categorie):?Recette{
-            $req = $this->connexion->prepare('SELECT * FROM Recette where categorie = :categorie;');
-            $req->bindParam(':categorie', $categorie->name);
-            $req->execute();
-            $res = $req->fetch(PDO::FETCH_ASSOC);
-            return $this->creerInstance($res);
-        }
-
-        public function findByGroupe(int $groupe):?Recette{
+        public function findByGroupe(int $groupe):?array{
             $req = $this->connexion->prepare('SELECT * FROM Recette where groupe = :groupe;');
             $req->bindParam(':groupe', $groupe);
             $req->execute();
-            $res = $req->fetch(PDO::FETCH_ASSOC);
-            return $this->creerInstance($res);
+            $res = $req->fetchAll(PDO::FETCH_ASSOC);
+            $recettes = array();
+            foreach ( $res as $raw){
+                $recettes[] = $this->creerInstance($raw);
+            }
+            return $recettes;
         }
 
-        public function filterByDuree(int $duree):?Recette{
-            $req = $this->connexion->prepare('SELECT * FROM Recette where duree <= :duree;');
-            $req->bindParam(':duree', $duree);
-            $req->execute();
-            $res = $req->fetch(PDO::FETCH_ASSOC);
-            return $this->creerInstance($res);
-        }
-
-        public function findByNom(string $nom):?Recette{
-            $req = $this->connexion->prepare('SELECT * FROM Recette where nom LIKE %:nom%;');
-            $req->bindParam(':nom', $nom);
-            $req->execute();
-            $res = $req->fetch(PDO::FETCH_ASSOC);
-            return $this->creerInstance($res);
-        }
-
-        public function insert($donnee):bool{
+        public function insert($donnee): bool {
             $req = $this->connexion->prepare('INSERT INTO Recette (nom, duree, categorie, image, groupe) VALUES (:nom, :duree, :categorie, :image, :groupe);');
-            $req->bindParam(':nom',$donnee->getNom());
-            $req->bindParam(':duree',$donnee->getDuree());
-            $req->bindParam(':categorie',$donnee->getCategorie());
-            $req->bindParam(':image',$donnee->getImage());
-            $req->bindParam(':groupe',$donnee->getGroupe());
+            
+            $nom = $donnee->getNom();
+            $duree = $donnee->getDuree();
+            $categorie = $donnee->getCategorie()->name;
+            $image = $donnee->getImage();
+            $groupe = $donnee->getGroupe();
+            
+            $req->bindParam(':nom', $nom);
+            $req->bindParam(':duree', $duree);
+            $req->bindParam(':categorie', $categorie);
+            $req->bindParam(':image', $image);
+            $req->bindParam(':groupe', $groupe);
+            
             return $req->execute();
         }
 
@@ -85,12 +73,21 @@
             $req = $this->connexion->prepare('UPDATE Recette 
                 SET nom=:nom, duree=:duree, categorie=:categorie, image=:image, groupe=:groupe
                 where Id_Recette = :id;');
-            $req->bindParam(':id',$donnee->getIdRecette());
-            $req->bindParam(':nom',$donnee->getNom());
-            $req->bindParam(':duree',$donnee->getDuree());
-            $req->bindParam(':categorie',$donnee->getCategorie());
-            $req->bindParam(':image',$donnee->getImage());
-            $req->bindParam(':groupe',$donnee->getGroupe());
+
+            $id = $donnee->getIdRecette();
+            $nom = $donnee->getNom();
+            $duree = $donnee->getDuree();
+            $categorie = $donnee->getCategorie()->name;
+            $image = $donnee->getImage();
+            $groupe = $donnee->getGroupe();
+            
+            $req->bindParam(':id',$id);
+            $req->bindParam(':nom', $nom);
+            $req->bindParam(':duree', $duree);
+            $req->bindParam(':categorie', $categorie);
+            $req->bindParam(':image', $image);
+            $req->bindParam(':groupe', $groupe);
+
             return $req->execute();
         }
 
@@ -107,7 +104,7 @@
             $Id_recette = $raw['Id_Recette'];
             $nom = $raw['nom'];
             $duree = $raw['duree'];
-            $categorie = $raw['categorie'];
+            $categorie = RecetteCategorie::fromName(strtoupper($raw['categorie']));
             $image = $raw['image'];
             $groupe = $raw['groupe'];
             $recette = new Recette($Id_recette,$nom,$duree,$categorie,$image,$groupe);

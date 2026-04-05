@@ -1,6 +1,6 @@
 <?php
 
-namespace api\Service;
+namespace backend\Service;
 
 class ApiService
 {
@@ -88,6 +88,20 @@ class ApiService
         }
 
         echo $jsonResponse;
+    }
+
+    public function getGroupe(string $jwt): ?int
+    {
+        $tokenParts = explode('.', $jwt);
+
+        if (count($tokenParts) < 2) {
+            return null;
+        }
+
+        $payload = base64_decode($tokenParts[1]);
+        $payloadData = json_decode($payload);
+
+        return $payloadData->role ?? null;
     }
 
     public function toArrayList(array $objects):array{

@@ -1,9 +1,11 @@
 <?php
-namespace api\Modele\Joueur;
+namespace backend\modele;
 
 enum RecetteCategorie
 {
     case DESSERT;
+    case PLATPRINCIPAL;
+    case ENTREE;
 
     public static function fromName(string $name): ?RecetteCategorie
     {

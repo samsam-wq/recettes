@@ -1,11 +1,13 @@
 <?php
     namespace Backend\Modele;
 
+    use backend\modele\RecetteCategorie;
+
     class Recette{
         private int $Id_recette;
         private string $nom;
         private int $duree;
-        private string $categorie;
+        private RecetteCategorie $categorie;
         private string $image;
         private int $groupe;
 
@@ -13,7 +15,7 @@
             int $Id_recette,
             string $nom,
             int $duree,
-            string $categorie,
+            RecetteCategorie $categorie,
             string $image,
             int $groupe)
         {
@@ -25,6 +27,17 @@
             $this->groupe=$groupe;
         }
 
+        public function toArray():array{
+            return [
+                'Id_recette' => $this->getIdRecette() ,
+                'nom' => $this->getNom() ,
+                'duree' => $this->getDuree() ,
+                'categorie' => $this->getCategorie()->name ,
+                'image' => $this->getImage() ,
+                'groupe' => $this->getGroupe() ,
+            ];
+        }
+
         public function getIdRecette():int{
             return $this->Id_recette ;
         }
@@ -34,7 +47,7 @@
         public function getDuree():int{
             return $this->duree ;
         }
-        public function getCategorie():string{
+        public function getCategorie():RecetteCategorie{
             return $this->categorie ;
         }
         public function getImage():string{
@@ -53,7 +66,7 @@
         public function setDuree(int $duree):void{
             $this->duree=$duree;
         }
-        public function setCategorie(string $categorie):void{
+        public function setCategorie(RecetteCategorie $categorie):void{
             $this->categorie=$categorie;
         }
         public function setImage(string $image):void{
