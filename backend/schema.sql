@@ -31,7 +31,7 @@ CREATE TABLE Recette(
    nom VARCHAR(50) ,
    duree INT,
    categorie VARCHAR(50) ,
-   image VARCHAR(50) ,
+   image VARCHAR(250) ,
    groupe INT ,
    PRIMARY KEY(Id_Recette)
 );
@@ -143,12 +143,12 @@ INSERT INTO Ingredient (prix, image, nom) VALUES
 -- Recettes
 -- ---------------------------------------------
 INSERT INTO Recette (nom, duree, categorie, image, groupe) VALUES
-    ('Poulet rôti aux herbes',     60,  'Platprincipal', 'poulet_roti.jpg',     1),
+    ('Poulet rôti aux herbes',     60,  'Plat', 'https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54.jpg.webp',     1),
     ('Quiche lorraine',            50,  'Entree',         'quiche.jpg',          1),
-    ('Pâtes carbonara',            20,  'Platprincipal', 'carbonara.jpg',       1),
-    ('Saumon citron-crème',        25,  'Platprincipal', 'saumon.jpg',          1),
-    ('Ratatouille',                45,  'Platprincipal', 'ratatouille.jpg',     1),
-    ('Omelette aux champignons',   15,  'Platprincipal', 'omelette.jpg',        1);
+    ('Pâtes carbonara',            20,  'Plat', 'carbonara.jpg',       1),
+    ('Saumon citron-crème',        25,  'Plat', 'saumon.jpg',          1),
+    ('Ratatouille',                45,  'Plat', 'ratatouille.jpg',     1),
+    ('Omelette aux champignons',   15,  'Plat', 'omelette.jpg',        1);
 
 -- ---------------------------------------------
 -- Etapes
@@ -337,18 +337,14 @@ INSERT INTO Utilise_R (Id_Ustensiles, Id_Recette, quantite) VALUES
 -- Noter
 -- ---------------------------------------------
 INSERT INTO Noter (Id_Recette, login, note, specialite, favori) VALUES
-    (1, 'alice',   5, true,  true),
-    (1, 'bob',     4, false, false),
-    (1, 'charlie', 3, false, true),
-    (2, 'alice',   4, false, true),
-    (2, 'bob',     5, true,  true),
-    (3, 'charlie', 5, true,  false),
-    (3, 'alice',   4, false, true),
-    (4, 'bob',     3, false, false),
-    (4, 'charlie', 4, false, true),
-    (5, 'alice',   5, true,  true),
-    (5, 'bob',     4, false, false),
-    (6, 'charlie', 3, false, false),
-    (6, 'alice',   4, false, true);
+    (1, 'Anna',   5, true,  true),
+    (1, 'Sam',     4, false, false),
+    (2, 'Anna',   4, false, true),
+    (2, 'Sam',     5, true,  true),
+    (3, 'Anna',   4, false, true),
+    (4, 'Sam',     3, false, false),
+    (5, 'Anna',   5, true,  true),
+    (5, 'Sam',     4, false, false),
+    (6, 'Anna',   4, false, true);
 
 commit;

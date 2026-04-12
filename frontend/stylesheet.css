@@ -441,6 +441,13 @@ button.info:hover   { background-color: var(--clr-info); color: #fff; }
     outline-offset: 2px;
 }
 
+.filter-option:has(input[type="radio"]:checked) .filter-pill {
+    background-color: var(--clr-primary);
+    border-color: var(--clr-primary);
+    color: #fff;
+    font-weight: 600;
+}
+
 /* ── En-tête résultats ───────────────────────────────────────── */
 .results-header {
     display: flex;

@@ -1,15 +1,23 @@
 <?php
     namespace Backend\Modele\Dao;
 
-    use Backend\Modele\Dao\Bd\ConnexionBD;
+    use backend\modele\dao\bd\ConnexionBD;
     use PDO;
-    use Backend\Modele\Noter;
+    use backend\modele\Noter;
 
     class DaoNoter implements Dao{
-        private $connexion;
+        private static ?DaoNoter $instance = null;
+        private readonly PDO $connexion;
 
-        public function __construct (){
-            $this->connexion=ConnexionBD::getInstance()->pdo();
+        private function __construct() {
+            $this->connexion = ConnexionBD::getInstance()->pdo();
+        }
+
+        public static function getInstance(): DaoNoter {
+            if (self::$instance == null) {
+                self::$instance = new DaoNoter();
+            }
+            return self::$instance;
         }
 
         public function findAll():array{
@@ -22,7 +30,7 @@
             return $noters;
         }
 
-        public function findById($id):?Noter{
+        public function findById($id):?object{
             $req = $this->connexion->prepare('SELECT * FROM Noter where Id_Recette = :Id_Recette and login = :login;');
             $req->bindParam(':Id_Recette', $id[0]);
             $req->bindParam(':login', $id[1]);
@@ -43,7 +51,7 @@
             return $noters;
         }
 
-        public function insert($donnee):bool{
+        public function insert($donnee):string{
             $req = $this->connexion->prepare('INSERT INTO Noter (Id_Recette, login, note, specialite, favori) VALUES (:Id_Recette, :login, :note, :specialite, :favori);');
             $req->bindParam(':Id_Recette',$donnee->getIdRecette());
             $req->bindParam(':login',$donnee->getLogin());

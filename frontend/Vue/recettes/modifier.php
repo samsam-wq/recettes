@@ -8,7 +8,42 @@
  *   array|null $old      — anciennes valeurs soumises (priorité sur $recette)
  */
 
-if (empty($recette)) {
+use \frontend\Controleur\RecetteControleur;
+
+$recetteControleur = RecetteControleur::getInstance();
+
+if (
+    isset($_POST['id']) && 
+    isset($_POST['nom']) && 
+    isset($_POST['duree']) && 
+    isset($_POST['categorie']) &&
+    isset($_POST['image']) 
+){
+    $reponse = $recetteControleur->modifierRecette(
+        $_POST['id'],
+        $_POST['nom'],
+        $_POST['duree'],
+        $_POST['categorie'],
+        $_POST['image'],
+        $_SESSION['groupe']
+    );
+    if ($reponse['status_code'] === 200){
+        header('Location: /recettes');
+        exit();
+    }else{
+        $erreurs = array($reponse['status_message']);
+        $old['nom'] = $_POST['nom'];
+        $old['duree'] =$_POST['duree'];
+        $old['categorie'] = $_POST['categorie'];
+        $old['image'] = $_POST['image'];
+    }
+}
+
+$reponse = $recetteControleur->laRecette($_GET['id']);
+
+if ($reponse['status_code']==200) {
+    $recette = $reponse['data'];
+}else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
           <p class="empty-message">Recette introuvable.</p>
           <a href="/recettes" class="btn btn--primary">Retour aux recettes</a></div>';
@@ -19,7 +54,7 @@ $erreurs = $erreurs ?? [];
 // $old prend la priorité sur $recette pour re-peupler après une erreur de validation
 $data = array_merge($recette, $old ?? []);
 
-$id          = (int)$recette['id'];
+$id          = (int)$recette['Id_recette'];
 $ingredients = $data['ingredients'] ?? $recette['ingredients'] ?? [['nom' => '', 'quantite' => '', 'unite' => '']];
 $etapes      = $data['etapes']      ?? $recette['etapes']      ?? [['titre' => '', 'description' => '']];
 
@@ -52,7 +87,7 @@ function modVal(array $data, string $key, string $default = ''): string {
     <?php endif; ?>
 
     <form class="recipe-form" method="POST"
-          action="/recettes/<?= $id ?>/modifier" enctype="multipart/form-data">
+          action="/recettes/modifier?id=<?= $id ?>" enctype="multipart/form-data">
 
         <input type="hidden" name="id" value="<?= $id ?>">
 
@@ -68,17 +103,11 @@ function modVal(array $data, string $key, string $default = ''): string {
             </div>
 
             <div class="row">
-                <label for="description">Description</label>
-                <textarea id="description" name="description"
-                          placeholder="Une courte description…"><?= modVal($data, 'description') ?></textarea>
-            </div>
-
-            <div class="row">
                 <label for="categorie">Catégorie</label>
                 <select id="categorie" name="categorie">
                     <option value="">— Choisir —</option>
-                    <?php foreach (['Dessert', 'Plat principal', 'Végétarien', 'Entrée', 'Soupe', 'Autre'] as $c): ?>
-                    <option value="<?= $c ?>" <?= modVal($data, 'categorie') === $c ? 'selected' : '' ?>>
+                    <?php foreach (['Dessert', 'Plat', 'Végétarien', 'Entree', 'Soupe', 'Autre'] as $c): ?>
+                    <option value="<?= $c ?>" <?= strtolower(modVal($data, 'categorie')) === strtolower($c) ? 'selected' : '' ?>>
                         <?= $c ?>
                     </option>
                     <?php endforeach; ?>
@@ -89,12 +118,6 @@ function modVal(array $data, string $key, string $default = ''): string {
                 <label for="duree">Durée (minutes)</label>
                 <input type="number" id="duree" name="duree" min="1" max="600"
                        value="<?= modVal($data, 'duree') ?>">
-            </div>
-
-            <div class="row">
-                <label for="personnes">Nombre de personnes</label>
-                <input type="number" id="personnes" name="personnes" min="1" max="50"
-                       value="<?= modVal($data, 'personnes') ?>">
             </div>
 
             <div class="row">
@@ -129,7 +152,6 @@ function modVal(array $data, string $key, string $default = ''): string {
                                placeholder="Unité" class="input-ingredient-unit"
                                value="<?= htmlspecialchars($ing['unite'] ?? '') ?>">
                     </div>
-                    <!-- Suppression d'une ligne via submit (sans JS) -->
                     <button type="submit" name="remove_ingredient" value="<?= $idx ?>"
                             class="btn-remove" formnovalidate title="Supprimer">✕</button>
                 </div>
@@ -169,26 +191,29 @@ function modVal(array $data, string $key, string $default = ''): string {
             </button>
         </div>
 
-        <!-- ── Zone danger ────────────────────────────────────── -->
-        <div class="form-card form-card--danger">
-            <h2 class="form-card-title">⚠️ Zone dangereuse</h2>
-            <p style="color:var(--clr-text-muted); font-size:.9rem; margin-bottom:16px;">
-                La suppression est définitive et irréversible.
-            </p>
-            <button type="submit" name="delete" value="1"
-                    class="btn btn--danger-solid" formnovalidate
-                    onclick="return confirm('Supprimer définitivement cette recette ?')">
-                🗑️ Supprimer la recette
-            </button>
-        </div>
-
         <!-- ── Soumission ─────────────────────────────────────── -->
         <div class="form-submit-row">
-            <a href="/recettes/<?= $id ?>" class="btn btn--ghost">Annuler</a>
+            <a href="/recettes?id=<?= $id ?>" class="btn btn--ghost">Annuler</a>
             <button type="submit" name="save" value="1" class="btn btn--launch">
                 💾 Enregistrer les modifications
             </button>
         </div>
 
     </form>
+
+        <!-- ── Zone danger ────────────────────────────────────── -->
+        <form class="recipe-form" method="GET"
+          action="./supprimer?id=<?= $id ?>" enctype="multipart/form-data">
+            <div class="form-card form-card--danger">
+                <button type="submit" name="delete" value="<?=(int) $id ?>"
+                        class="btn btn--danger-solid" formnovalidate
+                        onclick="return confirm('Supprimer définitivement cette recette ?')">
+                    🗑️ Supprimer la recette
+                </button>
+                <p>
+                    La suppression est définitive et irréversible.
+                </p>
+            </div>
+        </form>
+
 </div>

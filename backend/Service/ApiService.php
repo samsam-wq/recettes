@@ -104,6 +104,20 @@ class ApiService
         return $payloadData->role ?? null;
     }
 
+    public function getLogin(string $jwt): ?string
+    {
+        $tokenParts = explode('.', $jwt);
+
+        if (count($tokenParts) < 2) {
+            return null;
+        }
+
+        $payload = base64_decode($tokenParts[1]);
+        $payloadData = json_decode($payload);
+
+        return $payloadData->login ?? null;
+    }
+
     public function toArrayList(array $objects):array{
         $array = array();
         foreach ($objects as $object){

@@ -39,7 +39,7 @@ class UtilisateurControleur {
         }
     }
 
-    public function getRole(string $jwt): ?string
+    public function getGroupe(string $jwt): ?string
     {
         $tokenParts = explode('.', $jwt);
 

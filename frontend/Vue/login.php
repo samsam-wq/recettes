@@ -7,9 +7,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"]) && isset($
     $token = $controleur->seConnecter(trim($_POST["username"]), trim($_POST["password"]));
     if ($token) {
         $_SESSION['token'] = $token;
-        $_SESSION['role']  = $controleur->getRole($token);
+        $_SESSION['groupe']  = $controleur->getGroupe($token);
         $_SESSION['login'] = $controleur->getLogin($token);
-        header("Location: /tableauDeBord");
+        header("Location: /recettes");
         exit();
     } else {
         $erreur = "Nom d'utilisateur ou mot de passe incorrect.";

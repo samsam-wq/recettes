@@ -51,7 +51,7 @@
             return $recettes;
         }
 
-        public function insert($donnee): bool {
+        public function insert($donnee): string|bool {
             $req = $this->connexion->prepare('INSERT INTO Recette (nom, duree, categorie, image, groupe) VALUES (:nom, :duree, :categorie, :image, :groupe);');
             
             $nom = $donnee->getNom();
@@ -66,7 +66,8 @@
             $req->bindParam(':image', $image);
             $req->bindParam(':groupe', $groupe);
             
-            return $req->execute();
+            $req->execute();
+            return $this->connexion->lastInsertId();
         }
 
         public function update($donnee):bool{

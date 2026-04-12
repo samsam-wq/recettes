@@ -10,14 +10,26 @@
  *                         'etapes'      => [['ordre', 'titre', 'description'], …]]
  */
 
-if (empty($recette)) {
+use \frontend\Controleur\RecetteControleur;
+
+$recetteControleur = RecetteControleur::getInstance();
+
+if (isset($_GET['id'])){
+    $reponse = $recetteControleur->laRecette($_GET['id']);
+}else{
+    $reponse = $recetteControleur->getRecetteAleatoire();
+}
+
+if ($reponse['status_code']===200) {
+    $recette = $reponse['data'];
+}else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
           <p class="empty-message">Recette introuvable.</p>
           <a href="/recettes" class="btn btn--primary">Retour aux recettes</a></div>';
     return;
 }
 
-$id        = (int) $recette['id'];
+$id        = (int) $recette['Id_recette'];
 $nom       = htmlspecialchars($recette['nom']         ?? '');
 $categorie = htmlspecialchars($recette['categorie']   ?? '');
 $duree     = htmlspecialchars($recette['duree']       ?? '');
@@ -97,21 +109,21 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
             <!-- Actions -->
             <div class="detail-actions">
                 <?php if (!empty($etapes)): ?>
-                <a href="/recettes/<?= $id ?>/lancer" class="btn btn--launch">
+                <a href="/recettes/lancer?id=<?= $id ?>" class="btn btn--launch">
                     ▶ Lancer la recette
                 </a>
                 <?php endif; ?>
 
-                <form method="POST" action="/recettes/favori" style="display:inline;">
+                <form method="POST" action="/recettes/favoris?id=<?=(int) $id ?>" style="display:inline;">
                     <input type="hidden" name="recette_id" value="<?= $id ?>">
                     <input type="hidden" name="action"     value="toggle">
-                    <input type="hidden" name="redirect"   value="/recettes/<?= $id ?>">
+                    <input type="hidden" name="redirect"   value="/recettes?id=<?= $id ?>">
                     <button type="submit" class="btn btn--fav <?= $favori ? 'btn--fav-active' : '' ?>">
                         <?= $favori ? '❤️ Favori' : '🤍 Ajouter aux favoris' ?>
                     </button>
                 </form>
 
-                <a href="/recettes/<?= $id ?>/modifier" class="btn btn--ghost">✏️ Modifier</a>
+                <a href="/recettes/modifier?id=<?= $id ?>" class="btn btn--ghost">✏️ Modifier</a>
             </div>
         </div>
     </div>

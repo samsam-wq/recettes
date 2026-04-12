@@ -22,6 +22,14 @@
             $this->favori=$favori;
         }
 
+        public function toArray(){
+            return [
+                'note' => $this->note ,
+                'specialite' => $this->specialite ,
+                'favori' => $this->favori 
+            ];
+        }
+
         public function getIdRecette():int{
             return $this->Id_Recette ;
         }

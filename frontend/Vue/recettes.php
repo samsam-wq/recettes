@@ -6,20 +6,46 @@
  *   array  $recettes  — liste des recettes à afficher
  *   int    $total     — nombre total de résultats
  */
+use \frontend\Controleur\RecetteControleur;
+
+$recetteControleur = RecetteControleur::getInstance();
 
 $categorie = htmlspecialchars($_GET['categorie'] ?? '');
 $duree     = htmlspecialchars($_GET['duree']     ?? '');
 $q         = htmlspecialchars($_GET['q']         ?? '');
 $favoris   = isset($_GET['favoris']);
-$total     = $total ?? count($recettes ?? []);
 
 $cats = [
     ''           => 'Toutes',
-    'dessert'    => '🍰 Dessert',
+    'dessert'=> '🍰 Dessert',
     'plat'       => '🍽️ Plat principal',
     'vegetarien' => '🥗 Végétarien',
     'entree'     => '🥣 Entrée',
 ];
+
+if (isset($categorie) || isset($duree) || isset($q )){
+    $reponse = $recetteControleur->filtrerRecettes($categorie,$duree,$q,$favoris);
+
+    if ($reponse['status_code']==200) {
+        $recettes = $reponse['data'];
+    }
+}else{
+    $reponse = $recetteControleur->toutesLesRecettesDuGroupe();
+
+    if ($reponse['status_code']==200) {
+        $recettes = $reponse['data'];
+    }
+}
+
+$total     = $total ?? count($recettes ?? []);
+//TODO mettre en favori
+if (isset($_GET['idFavori'])){
+
+}
+
+if (isset($_GET['erreur'])){
+    $erreur = $_GET['erreur'];
+}
 
 function recetteFilterUrl(array $overrides = []): string {
     $params = array_merge($_GET, $overrides);
@@ -50,14 +76,24 @@ function recetteFilterUrl(array $overrides = []): string {
             <button type="submit" class="btn btn--primary">Rechercher</button>
         </form>
 
-        <form method="GET" action="/recettes/aleatoire">
-            <button type="submit" class="btn btn--secondary">🎲 Recette aléatoire</button>
-        </form>
+        <?php if ($total > 0): ?>
+            <?php $idAleatoire = $recettes[random_int(0, $total - 1)]['Id_recette']; ?>
+            <form method="GET" action="./recettes/detail">
+                <input type="hidden" name="id" value="<?= $idAleatoire ?>">
+                <button type="submit" class="btn btn--secondary">🎲 Recette aléatoire</button>
+            </form>
+        <?php endif; ?>
 
         <a href="/recettes/ajouter" class="btn btn--add">➕ Ajouter</a>
 
     </div>
 </section>
+
+<?php if (isset($erreur)): ?>
+    <div class="form-errors">
+            <p class="form-error-item">⚠️ <?= htmlspecialchars($erreur) ?></p>
+    </div>
+<?php endif; ?>
 
 <!-- ── Layout filtres + grille ───────────────────────────────── -->
 <div class="layout-with-filters">
@@ -163,20 +199,20 @@ function recetteFilterUrl(array $overrides = []): string {
                         <?= htmlspecialchars($r['categorie'] ?? 'Autre') ?>
                     </span>
 
-                    <form method="POST" action="/recettes/favori" class="favorite-form">
-                        <input type="hidden" name="recette_id" value="<?= (int)$r['id'] ?>">
+                    <form method="POST" action="/recettes?idFavori=<?= (int)$r['Id_recette'] ?>" class="favorite-form">
+                        <input type="hidden" name="recette_id" value="<?= (int)$r['Id_recette'] ?>">
                         <input type="hidden" name="action" value="toggle">
                         <input type="hidden" name="redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
-                        <button type="submit" class="btn-favorite <?= !empty($r['favori']) ? 'btn-favorite--active' : '' ?>"
-                                title="<?= !empty($r['favori']) ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
-                            <?= !empty($r['favori']) ? '❤️' : '🤍' ?>
+                        <button type="submit" class="btn-favorite <?= ( $r['notes']!==null && !empty($r['notes']['favori'])) ? 'btn-favorite--active' : '' ?>"
+                                title="<?= ( $r['notes']!==null && !empty($r['notes']['favori'])) ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                            <?= ( $r['notes']!==null && !empty($r['notes']['favori'])) ? '❤️' : '🤍' ?>
                         </button>
                     </form>
                 </div>
 
                 <div class="card-body">
                     <h3 class="card-title">
-                        <a href="/recettes/<?= (int)$r['id'] ?>" class="card-title-link">
+                        <a href="./recettes/detail?id=<?= (int)$r['Id_recette'] ?>" class="card-title-link">
                             <?= htmlspecialchars($r['nom']) ?>
                         </a>
                     </h3>
@@ -189,8 +225,8 @@ function recetteFilterUrl(array $overrides = []): string {
                         <?php endif; ?>
                     </div>
                     <div class="card-actions">
-                        <a href="/recettes/<?= (int)$r['id'] ?>" class="card-btn card-btn--view">Voir</a>
-                        <a href="/recettes/<?= (int)$r['id'] ?>/modifier" class="card-btn card-btn--edit">✏️</a>
+                        <a href="./recettes/detail?id=<?= (int)$r['Id_recette'] ?>" class="card-btn card-btn--view">Voir</a>
+                        <a href="./recettes/modifier?id=<?= (int)$r['Id_recette'] ?>" class="card-btn card-btn--edit">✏️</a>
                     </div>
                 </div>
             </article>

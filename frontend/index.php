@@ -45,18 +45,15 @@ if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION
 <header class="navbar">
     <div class="navbar-inner">
 
-        <a href="/tableauDeBord" class="navbar-brand">
+        <a href="/recettes" class="navbar-brand">
             <span class="navbar-brand-icon">🍳</span>
             <span class="navbar-brand-text">Nos Recettes</span>
         </a>
-
-        <a href="/tableauDeBord" class="dropbtn">Tableau de bord</a>
 
         <div class="dropdown">
             <button class="dropbtn">Recettes ▾</button>
             <div class="dropdown-content">
                 <a href="/recettes/ajouter">➕ Ajouter une Recette</a>
-                <a href="/recettes">📋 Liste des Recettes</a>
             </div>
         </div>
 
