@@ -36,7 +36,7 @@ $duree     = htmlspecialchars($recette['duree']       ?? '');
 $personnes = (int)($recette['personnes']              ?? 0);
 $desc      = htmlspecialchars($recette['description'] ?? '');
 $image     = htmlspecialchars($recette['image']       ?? '');
-$favori    = !empty($recette['favori']);
+$favori    = ( $recette['notes']!==null && !empty($recette['notes']['favori']));
 $ingredients = $recette['ingredients'] ?? [];
 $etapes      = $recette['etapes']      ?? [];
 
