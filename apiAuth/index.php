@@ -45,7 +45,7 @@
                 if ($user){
                     //creation du token
                     $header = ['alg' => 'HS256','typ' => 'JWT'];
-                    $payload = ['login' => $user->getLogin(),'role' => $user->getGroupe(),'exp' => time()+3600];
+                    $payload = ['login' => $user->getLogin(),'role' => $user->getGroupe(),'exp' => time()+7200];
                     $token = $jwt_utils->generateJwt($header,$payload,$_SERVER['JWT_SECRET']);
                     $jwt_utils->deliverResponse(200, "[R401 REST AUTH] : Authentification OK",$token);
                 }else{

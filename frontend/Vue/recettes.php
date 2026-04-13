@@ -7,13 +7,16 @@
  *   int    $total     — nombre total de résultats
  */
 use \frontend\Controleur\RecetteControleur;
+use \frontend\Controleur\NoterControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
+$noterControleur = NoterControleur::getInstance();
 
 $categorie = htmlspecialchars($_GET['categorie'] ?? '');
 $duree     = htmlspecialchars($_GET['duree']     ?? '');
 $q         = htmlspecialchars($_GET['q']         ?? '');
 $favoris   = isset($_GET['favoris']);
+$specialite=isset($_GET['specialite']);
 
 $cats = [
     ''           => 'Toutes',
@@ -23,8 +26,15 @@ $cats = [
     'entree'     => '🥣 Entrée',
 ];
 
-if (isset($categorie) || isset($duree) || isset($q )){
-    $reponse = $recetteControleur->filtrerRecettes($categorie,$duree,$q,$favoris);
+if (isset($_GET['idFavori'])){
+    $reponse = $noterControleur->mettreOuEnleverEnfavori($_GET['idFavori']);
+    if ($reponse['status_code']!=200) {
+        $erreur = $reponse['status_message'];
+    }
+}
+
+if (isset($categorie) || isset($duree) || isset($q ) || isset($favori) || isset($specialite)){
+    $reponse = $recetteControleur->filtrerRecettes($categorie,$duree,$q,$favoris,$specialite);
 
     if ($reponse['status_code']==200) {
         $recettes = $reponse['data'];
@@ -38,10 +48,6 @@ if (isset($categorie) || isset($duree) || isset($q )){
 }
 
 $total     = $total ?? count($recettes ?? []);
-//TODO mettre en favori
-if (isset($_GET['idFavori'])){
-
-}
 
 if (isset($_GET['erreur'])){
     $erreur = $_GET['erreur'];
@@ -141,6 +147,12 @@ function recetteFilterUrl(array $overrides = []): string {
                         <span class="filter-pill">❤️ Favoris seulement</span>
                     </label>
                 </div>
+                <div class="filter-options">
+                    <label class="filter-option filter-option--toggle <?= $specialite ? 'filter-option--active' : '' ?>">
+                        <input type="checkbox" name="specialite" value="1" <?= $specialite ? 'checked' : '' ?>>
+                        <span class="filter-pill">👨‍🍳 Spécialitées</span>
+                    </label>
+                </div>
             </fieldset>
 
             <button type="submit" class="btn btn--filter-apply">Appliquer</button>
@@ -153,7 +165,7 @@ function recetteFilterUrl(array $overrides = []): string {
 
         <div class="results-header">
             <p class="results-count"><?= $total ?> recette<?= $total > 1 ? 's' : '' ?></p>
-            <?php if ($categorie || $duree || $favoris || $q): ?>
+            <?php if ($categorie || $duree || $favoris || $q || $specialite): ?>
             <div class="active-filters">
                 <?php if ($q): ?>
                     <span class="active-filter-tag">"<?= $q ?>"
@@ -170,6 +182,10 @@ function recetteFilterUrl(array $overrides = []): string {
                 <?php if ($favoris): ?>
                     <span class="active-filter-tag">Favoris
                         <a href="<?= recetteFilterUrl(['favoris' => '']) ?>" class="tag-remove">×</a></span>
+                <?php endif; ?>
+                <?php if ($specialite): ?>
+                    <span class="active-filter-tag">Spécialité
+                        <a href="<?= recetteFilterUrl(['specialite' => '']) ?>" class="tag-remove">×</a></span>
                 <?php endif; ?>
             </div>
             <?php endif; ?>
@@ -220,9 +236,9 @@ function recetteFilterUrl(array $overrides = []): string {
                         <?php if (!empty($r['duree'])): ?>
                             <span class="meta-item">⏱ <?= htmlspecialchars($r['duree']) ?> min</span>
                         <?php endif; ?>
-                        <?php if (!empty($r['personnes'])): ?>
-                            <span class="meta-item">👤 <?= (int)$r['personnes'] ?> pers.</span>
-                        <?php endif; ?>
+                        <?php if (!empty($r['notes'])): ?>
+                            <span class="meta-item"> <?= htmlspecialchars($r['notes']['note']) ?> /5</span>
+                        <?php endif; ?>    
                     </div>
                     <div class="card-actions">
                         <a href="./recettes/detail?id=<?= (int)$r['Id_recette'] ?>" class="card-btn card-btn--view">Voir</a>

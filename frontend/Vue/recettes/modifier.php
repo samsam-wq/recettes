@@ -9,8 +9,13 @@
  */
 
 use \frontend\Controleur\RecetteControleur;
+use \frontend\Controleur\NoterControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
+$noterControleur = NoterControleur::getInstance();
+
+$erreurs = array();
+$redirection = false;
 
 if (
     isset($_POST['id']) && 
@@ -28,15 +33,29 @@ if (
         $_SESSION['groupe']
     );
     if ($reponse['status_code'] === 200){
-        header('Location: /recettes');
-        exit();
+        $redirection = true;
     }else{
-        $erreurs = array($reponse['status_message']);
+        $erreurs[] = $reponse['status_message'];
         $old['nom'] = $_POST['nom'];
         $old['duree'] =$_POST['duree'];
         $old['categorie'] = $_POST['categorie'];
         $old['image'] = $_POST['image'];
     }
+}
+
+if (isset($_POST['id']) && isset($_POST['points'])) {
+    $reponse = $noterControleur->modifierNoteNote($_POST['id'],$_POST['points']);
+    if ($reponse['status_code'] === 200){
+        $redirection = true;
+    }else{
+        $erreurs[] = $reponse['status_message'];
+        $oldNote['points'] = $_POST['points'];
+    }
+}
+
+if ($redirection) {
+    header('Location: /recettes');
+    exit();
 }
 
 $reponse = $recetteControleur->laRecette($_GET['id']);
@@ -53,6 +72,9 @@ if ($reponse['status_code']==200) {
 $erreurs = $erreurs ?? [];
 // $old prend la priorité sur $recette pour re-peupler après une erreur de validation
 $data = array_merge($recette, $old ?? []);
+if(isset($recette['notes'])){
+    $dataNote = array_merge($recette['notes'], $oldNote ?? []);
+}
 
 $id          = (int)$recette['Id_recette'];
 $ingredients = $data['ingredients'] ?? $recette['ingredients'] ?? [['nom' => '', 'quantite' => '', 'unite' => '']];
@@ -131,6 +153,12 @@ function modVal(array $data, string $key, string $default = ''): string {
                          alt="Aperçu" class="image-preview">
                 </div>
                 <?php endif; ?>
+            </div>
+
+            <div class="row">
+                <label for="duree">Note</label>
+                <input type="number" id="points" name="points" min="1" max="5"
+                       value="<?php echo isset($dataNote) ? modVal($dataNote, 'note') : 1 ?>">
             </div>
         </div>
 

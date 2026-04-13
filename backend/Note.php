@@ -71,14 +71,8 @@
                 break;
             }
 
-            $segments = explode('/', $_SERVER['REQUEST_URI']);
-            $id = $segments[2] ?? null;
-            if (!$id || !ctype_digit($id)) {
-                $apiService->deliverResponse(400, "Champs Id manquant");
-                break;
-            }
-
             $champsManquants = [];
+            if (empty($data['Id_Recette'])) $champsManquants[] = 'Id_Recette';
             if (empty($data['note'])) $champsManquants[] = 'note';
             if ($data['favori']===0) {
                 $favori=false;
@@ -101,7 +95,7 @@
             }
 
             try{
-                $id = $noterControleur->modifierNote($id,$login,$data['note'],$specialite,$favori);
+                $id = $noterControleur->ajouterNote($data['Id_Recette'],$login,$data['note'],$specialite,$favori);
                 if ($id) {
                     $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
                 }else{
@@ -190,7 +184,7 @@
             try{
                 $id = $noterControleur->modifierNote($id,$login,$data['note'],$specialite,$favori);
                 if ($id) {
-                    $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
+                    $apiService->deliverResponse(200, "Donnees modifiees avec succes.",$id);
                 }else{
                     $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
                 }

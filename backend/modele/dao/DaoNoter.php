@@ -64,7 +64,7 @@
             $req->bindParam(':specialite',$specialite);
             $req->bindParam(':favori',$favori);
             $req->execute();
-            return $this->connexion->lastInsertId();
+            return $id;
         }
 
         public function update($donnee):bool{

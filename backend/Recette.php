@@ -36,6 +36,7 @@
             $duree = $segments[3] ?? null;
             $recherche = $segments[4] ?? null;
             $favori = $segments[5] ?? null;
+            $specialite = $segments[6] ?? null;
             //byId
             if (isset($id )&& ctype_digit($id)) {
                 $recette = $recetteControleur->laRecette($id);
@@ -47,8 +48,8 @@
                     $apiService->deliverResponse(404, "Requete valide mais aucune donnée à récupérer");
                 }
             }//recherche
-            elseif(($id && !ctype_digit($id)) || $duree || $recherche || $favori){
-                $recettes = $recetteControleur->filtrerRecettes($groupe,$login,$id,$duree,$recherche,$favori);
+            elseif(($id && !ctype_digit($id)) || $duree || $recherche || $favori || $specialite){
+                $recettes = $recetteControleur->filtrerRecettes($groupe,$login,$id,$duree,$recherche,$favori,$specialite);
                 if ($recettes){
                     $recettes = $apiService->toArrayList($recettes);
                     $apiService->deliverResponse(200, "Donnée récupérée avec succès.",$recettes);
@@ -116,7 +117,7 @@
                 try {
                     $statut = $recetteControleur->supprimerRecette($id);
                     if ($statut) {
-                        $apiService->deliverResponse(201, "Donnees supprimée avec succes.");
+                        $apiService->deliverResponse(200, "Donnees supprimée avec succes.");
                     }else{
                         $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
                     }

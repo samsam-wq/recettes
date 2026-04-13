@@ -11,11 +11,33 @@
  */
 
 use \frontend\Controleur\RecetteControleur;
+use \frontend\Controleur\NoterControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
+$noterControleur = NoterControleur::getInstance();
 
 if (isset($_GET['id'])){
-    $reponse = $recetteControleur->laRecette($_GET['id']);
+    $id = $_GET['id'];
+}
+
+if (isset($_GET['idFav'])){
+    $id = $_GET['idFav'];
+    $reponse = $noterControleur->mettreOuEnleverEnfavori($_GET['idFav']);
+    if ($reponse['status_code']!=200) {
+        $erreur = $reponse['status_message'];
+    }
+}
+
+if (isset($_GET['idSpe'])){
+    $id = $_GET['idSpe'];
+    $reponse = $noterControleur->mettreOuEnleverSpecialite($_GET['idSpe']);
+    if ($reponse['status_code']!=200) {
+        $erreur = $reponse['status_message'];
+    }
+}
+
+if (isset($id)){
+    $reponse = $recetteControleur->laRecette($id);
 }else{
     $reponse = $recetteControleur->getRecetteAleatoire();
 }
@@ -37,6 +59,7 @@ $personnes = (int)($recette['personnes']              ?? 0);
 $desc      = htmlspecialchars($recette['description'] ?? '');
 $image     = htmlspecialchars($recette['image']       ?? '');
 $favori    = ( $recette['notes']!==null && !empty($recette['notes']['favori']));
+$specialite    = ( $recette['notes']!==null && !empty($recette['notes']['specialite']));
 $ingredients = $recette['ingredients'] ?? [];
 $etapes      = $recette['etapes']      ?? [];
 
@@ -83,13 +106,6 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
                     <span class="detail-meta-label">Durée</span>
                 </div>
                 <?php endif; ?>
-                <?php if ($personnes): ?>
-                <div class="detail-meta-card">
-                    <span class="detail-meta-icon">👤</span>
-                    <span class="detail-meta-value"><?= $personnes ?></span>
-                    <span class="detail-meta-label">Personnes</span>
-                </div>
-                <?php endif; ?>
                 <?php if (!empty($etapes)): ?>
                 <div class="detail-meta-card">
                     <span class="detail-meta-icon">📋</span>
@@ -114,12 +130,21 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
                 </a>
                 <?php endif; ?>
 
-                <form method="POST" action="/recettes/favoris?id=<?=(int) $id ?>" style="display:inline;">
+                <form method="POST" action="/recettes/detail?idFav=<?=(int) $id ?>" style="display:inline;">
                     <input type="hidden" name="recette_id" value="<?= $id ?>">
                     <input type="hidden" name="action"     value="toggle">
                     <input type="hidden" name="redirect"   value="/recettes?id=<?= $id ?>">
                     <button type="submit" class="btn btn--fav <?= $favori ? 'btn--fav-active' : '' ?>">
                         <?= $favori ? '❤️ Favori' : '🤍 Ajouter aux favoris' ?>
+                    </button>
+                </form>
+
+                <form method="POST" action="/recettes/detail?idSpe=<?=(int) $id ?>" style="display:inline;">
+                    <input type="hidden" name="recette_id" value="<?= $id ?>">
+                    <input type="hidden" name="action"     value="toggle">
+                    <input type="hidden" name="redirect"   value="/recettes?id=<?= $id ?>">
+                    <button type="submit" class="btn btn--fav <?= $specialite ? 'btn--fav-active' : '' ?>">
+                        <?= $specialite ? '👨‍🍳 Spécialitée' : '👨‍🍳 Ajouter aux spécialitées' ?>
                     </button>
                 </form>
 

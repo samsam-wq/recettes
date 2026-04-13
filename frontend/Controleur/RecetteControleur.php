@@ -74,10 +74,11 @@ class RecetteControleur {
         ?string $categorie, 
         string|int $duree, 
         ?string $recherche,
-        string|int $favori): 
+        string|int $favori,
+        string|int $specialite): 
         ?array 
     {
-        return $this->apiServide->callApi($this->url,"GET",null,array($categorie,$duree,$recherche,$favori));
+        return $this->apiServide->callApi($this->url,"GET",null,array($categorie,$duree,$recherche,$favori,$specialite));
     }
 
     public function getRecetteAleatoire(){

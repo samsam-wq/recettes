@@ -68,7 +68,8 @@ class RecetteControleur {
         ?string $categorie, 
         string|int $duree, 
         ?string $recherche,
-        string|int $favori): 
+        string|int $favori,
+        string|int $specialite): 
         ?array 
     {
         $lstRecettes = $this->toutesLesRecettesDuGroupe($groupe);
@@ -98,6 +99,12 @@ class RecetteControleur {
 
             if (!empty($favori) && $aRetenir) {
                 if ($recette->getNotes() === null || $recette->getNotes()->getFavori() != $favori){
+                    $aRetenir = false;  
+                }
+            }
+
+            if (!empty($specialite) && $aRetenir) {
+                if ($recette->getNotes() === null || $recette->getNotes()->getSpecialite() != $specialite){
                     $aRetenir = false;  
                 }
             }

@@ -26,7 +26,7 @@ class NoterControleur {
         int $note,
         bool $specialite,
         bool $favori
-    ):string|bool{
+    ):string{
         return $this->notes->insert(new Noter($Id_Recette,$login,$note,$specialite,$favori));
     }
 

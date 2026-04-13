@@ -5,11 +5,17 @@
  * Variables attendues du contrôleur :
  *   array|null $erreurs  — tableau de messages d'erreur
  *   array|null $old      — anciennes valeurs (re-population du form)
+ * 
  */
 
 use \frontend\Controleur\RecetteControleur;
+use \frontend\Controleur\NoterControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
+$noterControleur = NoterControleur::getInstance();
+
+$erreurs = array();
+$redirection = false;
 
 if (
     isset($_POST['nom']) && 
@@ -26,10 +32,21 @@ if (
     );
     if ($reponse['status_code'] === 201){
         $id = $reponse['data'];
-        header('Location: /recettes/ajouterEtape?id='.$id);
-        exit();
+        //ajout note
+        $points=1;
+        if (!empty($_POST['points'])) {
+            $points = $_POST['points'];
+        }
+        $reponse = $noterControleur->ajouterNote($id,$points,false,false);
+        if ($reponse['status_code'] === 201){
+            header('Location: /recettes/ajouterEtape?id='.$id);
+            exit();
+        }else{
+            $erreurs[] = $reponse['status_message'];
+            $old['note'] = $_POST['points'];
+        }
     }else{
-        $erreurs = array($reponse['status_message']);
+        $erreurs[] = $reponse['status_message'];
         $old['nom'] = $_POST['nom'];
         $old['duree'] =$_POST['duree'];
         $old['categorie'] = $_POST['categorie'];
@@ -103,6 +120,12 @@ function oldVal(array $old, string $key, string $default = ''): string {
                 <input type="text" id="image" name="image"
                        placeholder="https://…"
                        value="<?= oldVal($old, 'image') ?>">
+            </div>
+
+            <div class="row">
+                <label for="duree">Note</label>
+                <input type="number" id="points" name="points" min="1" max="5"
+                       value="<?php if (isset($data)) modVal($data, 'note') ?>">
             </div>
         </div>
 
