@@ -1,15 +1,23 @@
 <?php
-    namespace Backend\Modele\Dao;
+    namespace backend\modele\dao;
 
-    use Backend\Modele\Dao\Bd\ConnexionBD;
+    use backend\modele\dao\bd\ConnexionBD;
+    use backend\modele\Etape;
     use PDO;
-    use Backend\Modele\Etape;
 
     class DaoEtape implements Dao{
-        private $connexion;
+        private static ?DaoEtape $instance = null;
+        private readonly PDO $connexion;
 
-        public function __construct (){
-            $this->connexion=ConnexionBD::getInstance()->pdo();
+        private function __construct() {
+            $this->connexion = ConnexionBD::getInstance()->pdo();
+        }
+
+        public static function getInstance(): DaoEtape {
+            if (self::$instance == null) {
+                self::$instance = new DaoEtape();
+            }
+            return self::$instance;
         }
 
         public function findAll():array{
@@ -38,7 +46,8 @@
         public function findByIdRecette($id):array{
             $req = $this->connexion->prepare('
                 SELECT * FROM Etape 
-                    where Id_Recette = :Id_Recette;
+                    where Id_Recette = :Id_Recette
+                    order by numero asc;
             ');
             $req->bindParam(':Id_Recette', $id);
             $req->execute();
@@ -50,23 +59,32 @@
             return $etapes;
         }
 
-        public function insert($donnee):bool{
+        public function insert($donnee):string{
+            $id = $donnee->getIdRecette();
+            $numero = $donnee->getNumero();
+            $titre = $donnee->getTitre();
+            $contenu= $donnee->getContenu();
             $req = $this->connexion->prepare('INSERT INTO Etape (Id_Recette, numero, titre, contenu) VALUES (:Id_Recette, :numero, :titre, :contenu);');
-            $req->bindParam(':Id_Recette',$donnee->getIdRecette());
-            $req->bindParam(':numero',$donnee->getNumero());
-            $req->bindParam(':titre',$donnee->getTitre());
-            $req->bindParam(':contenu',$donnee->getContenu());
-            return $req->execute();
+            $req->bindParam(':Id_Recette',$id);
+            $req->bindParam(':numero',$numero);
+            $req->bindParam(':titre',$titre);
+            $req->bindParam(':contenu',$contenu);
+            $req->execute();
+            return $id . " - " . $numero;
         }
 
         public function update($donnee):bool{
+            $id = $donnee->getIdRecette();
+            $numero = $donnee->getNumero();
+            $titre = $donnee->getTitre();
+            $contenu= $donnee->getContenu();
             $req = $this->connexion->prepare('UPDATE Etape 
                 SET titre=:titre, contenu=:contenu
                 where Id_Recette = :Id_Recette and numero = :numero;');
-            $req->bindParam(':Id_Recette',$donnee->getIdRecette());
-            $req->bindParam(':numero',$donnee->getNumero());
-            $req->bindParam(':titre',$donnee->getTitre());
-            $req->bindParam(':contenu',$donnee->getContenu());
+            $req->bindParam(':Id_Recette',$id);
+            $req->bindParam(':numero',$numero);
+            $req->bindParam(':titre',$titre);
+            $req->bindParam(':contenu',$contenu);
             return $req->execute();
         }
 
@@ -74,6 +92,12 @@
             $req = $this->connexion->prepare('DELETE FROM Etape where Id_Recette = :Id_Recette and numero = :numero;');
             $req->bindParam(':Id_Recette', $id[0]);
             $req->bindParam(':numero', $id[1]);
+            return $req->execute();
+        }
+
+        public function deleteEtapesDeLarecette($id):bool{
+            $req = $this->connexion->prepare('DELETE FROM Etape where Id_Recette = :Id_Recette;');
+            $req->bindParam(':Id_Recette', $id);
             return $req->execute();
         }
 

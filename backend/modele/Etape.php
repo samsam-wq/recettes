@@ -14,6 +14,15 @@
             $this->Id_Recette=$Id_Recette;
         }
 
+        public function toArray(){
+            return [
+                'Id_Recette' => $this->Id_Recette ,
+                'numero' => $this->numero ,
+                'titre' => $this->titre ,
+                'contenu' => $this->contenu 
+            ];
+        }
+
         public function getTitre():string{
             return $this->titre ;
         }
