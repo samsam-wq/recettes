@@ -91,6 +91,12 @@
             return $req->execute();
         }
 
+        public function deleteNotesDeLarecette($id):bool{
+            $req = $this->connexion->prepare('DELETE FROM Noter where Id_Recette = :Id_Recette;');
+            $req->bindParam(':Id_Recette', $id);
+            return $req->execute();
+        }
+
         private function creerInstance($raw):?Noter{
             if (!$raw){
                 return null;

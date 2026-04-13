@@ -34,6 +34,10 @@ class NoterControleur {
         return $this->notes->delete(array($Id_Recette,$login));
     }
 
+    public function supprimerNotesRecette(int $Id_Recette):bool{
+        return $this->notes->deleteNotesDeLarecette($Id_Recette);
+    }
+
     public function toutesLesNotes():?array{
         return $this->notes->findAll();
     }

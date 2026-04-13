@@ -118,9 +118,21 @@
             }
             $segments = explode('/', $_SERVER['REQUEST_URI']);
             $id = $segments[2] ?? null;
-            if ($id && ctype_digit($id)) {
+            $loginUrl = $segments[2] ?? null;
+            if ($id && ctype_digit($id) && $loginUrl) {
                 try {
                     $statut = $noterControleur->supprimerNote($id,$login);
+                    if ($statut) {
+                        $apiService->deliverResponse(201, "Donnees supprimée avec succes.");
+                    }else{
+                        $apiService->deliverResponse(400, "Données non supprimées (problème inconnu)");
+                    }
+                }catch (Exception $e){
+                    $apiService->deliverResponse(400, $e->getMessage());
+                }
+            }elseif($id && ctype_digit($id)){
+                try {
+                    $statut = $noterControleur->supprimerNotesRecette($id);
                     if ($statut) {
                         $apiService->deliverResponse(201, "Donnees supprimée avec succes.");
                     }else{
