@@ -1,5 +1,5 @@
 <?php
-    namespace Backend\Modele\Dao;
+    namespace backend\modele\dao;
 
     use backend\modele\dao\bd\ConnexionBD;
     use PDO;
@@ -52,24 +52,35 @@
         }
 
         public function insert($donnee):string{
+            $id=$donnee->getIdRecette();
+            $login=$donnee->getLogin();
+            $note=$donnee->getNote();
+            $specialite = $donnee->getSpecialite() ? 1 : 0;
+            $favori     = $donnee->getFavori()     ? 1 : 0;
             $req = $this->connexion->prepare('INSERT INTO Noter (Id_Recette, login, note, specialite, favori) VALUES (:Id_Recette, :login, :note, :specialite, :favori);');
-            $req->bindParam(':Id_Recette',$donnee->getIdRecette());
-            $req->bindParam(':login',$donnee->getLogin());
-            $req->bindParam(':note',$donnee->getNote());
-            $req->bindParam(':specialite',$donnee->getSpecialite());
-            $req->bindParam(':favori',$donnee->getFavori());
-            return $req->execute();
+            $req->bindParam(':Id_Recette',$id);
+            $req->bindParam(':login',$login);
+            $req->bindParam(':note',$note);
+            $req->bindParam(':specialite',$specialite);
+            $req->bindParam(':favori',$favori);
+            $req->execute();
+            return $this->connexion->lastInsertId();
         }
 
         public function update($donnee):bool{
+            $id=$donnee->getIdRecette();
+            $login=$donnee->getLogin();
+            $note=$donnee->getNote();
+            $specialite = $donnee->getSpecialite() ? 1 : 0;
+            $favori     = $donnee->getFavori()     ? 1 : 0;
             $req = $this->connexion->prepare('UPDATE Noter 
                 SET note=:note, specialite=:specialite, favori=:favori
                 where Id_Recette = :Id_Recette and login = :login;');
-            $req->bindParam(':Id_Recette',$donnee->getIdRecette());
-            $req->bindParam(':login',$donnee->getLogin());
-            $req->bindParam(':note',$donnee->getNote());
-            $req->bindParam(':specialite',$donnee->getSpecialite());
-            $req->bindParam(':favori',$donnee->getFavori());
+            $req->bindParam(':Id_Recette',$id);
+            $req->bindParam(':login',$login);
+            $req->bindParam(':note',$note);
+            $req->bindParam(':specialite',$specialite);
+            $req->bindParam(':favori',$favori);
             return $req->execute();
         }
 

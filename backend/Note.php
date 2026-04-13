@@ -9,11 +9,10 @@
     $loader->addNamespace('backend\\', $_SERVER['DOCUMENT_ROOT']);
 
     use backend\Service\ApiService;
-    use backend\Controleur\RecetteControleur;
-    use backend\modele\RecetteCategorie;
+    use backend\controleur\NoterControleur;
 
     $apiService = ApiService::getInstance();
-    $recetteControleur = RecetteControleur::getInstance();
+    $noterControleur = NoterControleur::getInstance();
 
     $token = $apiService->getBearerToken();
     if (!$token || !$apiService->isTokenValid($token)){
@@ -33,35 +32,28 @@
             }
             $segments = explode('/', $_SERVER['REQUEST_URI']);
             $id = $segments[2] ?? null;
-            $duree = $segments[3] ?? null;
-            $recherche = $segments[4] ?? null;
-            $favori = $segments[5] ?? null;
-            //byId
-            if (isset($id )&& ctype_digit($id)) {
-                $recette = $recetteControleur->laRecette($id);
-                if ($recette){
-                    $recette = $recetteControleur->ajouterNote($recette,$login);
-                    $recette = $recette->toArray();
-                    $apiService->deliverResponse(200, "Donnée récupérée avec succès.",$recette);
+            $loginUrl = $segments[3] ?? null;
+            if (isset($id )&& ctype_digit($id) && isset($loginUrl)) {
+                $note = $noterControleur->laNote($id,$login);
+                if ($note){
+                    $note = $note->toArray();
+                    $apiService->deliverResponse(200, "Donnée récupérée avec succès.",$note);
                 }else{
                     $apiService->deliverResponse(404, "Requete valide mais aucune donnée à récupérer");
                 }
-            }//recherche
-            elseif(($id && !ctype_digit($id)) || $duree || $recherche || $favori){
-                $recettes = $recetteControleur->filtrerRecettes($groupe,$login,$id,$duree,$recherche,$favori);
-                if ($recettes){
-                    $recettes = $apiService->toArrayList($recettes);
-                    $apiService->deliverResponse(200, "Donnée récupérée avec succès.",$recettes);
+            }elseif(isset($id )&& ctype_digit($id)){
+                $notes = $noterControleur->lesNotesDuPlat($id);
+                if ($notes){
+                    $notes = $apiService->toArrayList($notes);
+                    $apiService->deliverResponse(200, "Donnée récupérée avec succès.",$notes);
                 }else{
                     $apiService->deliverResponse(404, "Requete valide mais aucune donnée à récupérer");
                 }
-            //findAll
             }else{
-                $recettes = $recetteControleur->toutesLesRecettesDuGroupe($groupe);
-                if ($recettes){
-                    $recette = $recetteControleur->ajouterNoteList($recettes,$login);
-                    $recettes = $apiService->toArrayList($recettes);
-                    $apiService->deliverResponse(200, "Donnée récupérée avec succès.",$recettes);
+                $notes = $noterControleur->toutesLesNotes();
+                if ($notes){
+                    $notes = $apiService->toArrayList($notes);
+                    $apiService->deliverResponse(200, "Donnée récupérée avec succès.",$notes);
                 }else{
                     $apiService->deliverResponse(404, "Requete valide mais aucune donnée à récupérer");
                 }
@@ -78,31 +70,45 @@
                 $apiService->deliverResponse(400, "JSON invalide");
                 break;
             }
+
+            $segments = explode('/', $_SERVER['REQUEST_URI']);
+            $id = $segments[2] ?? null;
+            if (!$id || !ctype_digit($id)) {
+                $apiService->deliverResponse(400, "Champs Id manquant");
+                break;
+            }
+
             $champsManquants = [];
-            if (empty($data['nom'])) $champsManquants[] = 'nom';
-            if (empty($data['duree'])) $champsManquants[] = 'prenom';
-            if (empty($data['categorie'])) $champsManquants[] = 'numeroDeLicence';
-            if (empty($data['image'])) $champsManquants[] = 'dateDeNaissance';
-            if (empty($data['groupe'])) $champsManquants[] = 'tailleEnCm'; 
+            if (empty($data['note'])) $champsManquants[] = 'note';
+            if ($data['favori']===0) {
+                $favori=false;
+            }elseif($data['favori']===1){
+                $favori=true;
+            }else{
+                $champsManquants[] = 'favori';
+            }
+            if ($data['specialite']===0) {
+                $specialite=false;
+            }elseif($data['specialite']===1){
+                $specialite=true;
+            }else{
+                $champsManquants[] = 'specialite';
+            }
             if (!empty($champsManquants)) {
                 $message = "champs " . implode(', ',  $champsManquants) . " absent(s).";
                 $apiService->deliverResponse(400, $message);
                 break;
             }
-            if (RecetteCategorie::fromName($data['categorie']) === null) {
-                $apiService->deliverResponse(400, "categorie invalide");
-            }
-            $id = $recetteControleur->ajouterRecette(
-                $data['nom'],
-                $data['duree'],
-                RecetteCategorie::fromName($data['categorie']),
-                $data['image'],
-                $data['groupe']
-            );
-            if ($id) {
-                $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
-            }else{
-                $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
+
+            try{
+                $id = $noterControleur->modifierNote($id,$login,$data['note'],$specialite,$favori);
+                if ($id) {
+                    $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
+                }else{
+                    $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
+                }
+            }catch (Exception $e){
+                $apiService->deliverResponse(400, $e->getMessage());
             }
             break;
         case "DELETE" :
@@ -114,17 +120,17 @@
             $id = $segments[2] ?? null;
             if ($id && ctype_digit($id)) {
                 try {
-                    $statut = $recetteControleur->supprimerRecette($id);
+                    $statut = $noterControleur->supprimerNote($id,$login);
                     if ($statut) {
                         $apiService->deliverResponse(201, "Donnees supprimée avec succes.");
                     }else{
-                        $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
+                        $apiService->deliverResponse(400, "Données non supprimées (problème inconnu)");
                     }
                 }catch (Exception $e){
                     $apiService->deliverResponse(400, $e->getMessage());
                 }
             }else{
-                $apiService->deliverResponse(400, "Champs joueurId manquant");
+                $apiService->deliverResponse(400, "Champs id manquant");
                 break;
             }
             break;
@@ -139,42 +145,45 @@
                 $apiService->deliverResponse(400, "JSON invalide");
                 break;
             }
+
+            $segments = explode('/', $_SERVER['REQUEST_URI']);
+            $id = $segments[2] ?? null;
+            if (!$id || !ctype_digit($id)) {
+                $apiService->deliverResponse(400, "Champs Id manquant");
+                break;
+            }
+
             $champsManquants = [];
-            if (empty($data['nom'])) $champsManquants[] = 'nom';
-            if (empty($data['duree'])) $champsManquants[] = 'duree';
-            if (empty($data['categorie'])) $champsManquants[] = 'categorie';
-            if (empty($data['image'])) $champsManquants[] = 'image';
-            if (empty($data['groupe'])) $champsManquants[] = 'groupe'; 
+            if (empty($data['note'])) $champsManquants[] = 'note';
+            if ($data['favori']===0) {
+                $favori=false;
+            }elseif($data['favori']===1){
+                $favori=true;
+            }else{
+                $champsManquants[] = 'favori';
+            }
+            if ($data['specialite']===0) {
+                $specialite=false;
+            }elseif($data['specialite']===1){
+                $specialite=true;
+            }else{
+                $champsManquants[] = 'specialite';
+            }
             if (!empty($champsManquants)) {
                 $message = "champs " . implode(', ',  $champsManquants) . " absent(s).";
                 $apiService->deliverResponse(400, $message);
                 break;
             }
 
-            if (RecetteCategorie::fromName($data['categorie']) === null) {
-                $apiService->deliverResponse(400, "categorie invalide");
-                break;
-            }
-
-            $segments = explode('/', $_SERVER['REQUEST_URI']);
-            $id = $segments[2] ?? null;
-            if ($id && ctype_digit($id)) {
-                $statut = $recetteControleur->modifierRecette(
-                    $id,
-                    $data['nom'],
-                    $data['duree'],
-                    RecetteCategorie::fromName($data['categorie']),
-                    $data['image'],
-                    $data['groupe']
-                );
-                if ($statut) {
-                    $apiService->deliverResponse(200, "Donnees modifiée avec succes.",$data);
+            try{
+                $id = $noterControleur->modifierNote($id,$login,$data['note'],$specialite,$favori);
+                if ($id) {
+                    $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
                 }else{
                     $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
                 }
-            }else{
-                $apiService->deliverResponse(400, "Champs RecetteId manquant");
-                break;
+            }catch (Exception $e){
+                $apiService->deliverResponse(400, $e->getMessage());
             }
             break;
         default :

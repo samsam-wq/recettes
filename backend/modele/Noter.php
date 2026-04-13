@@ -24,6 +24,8 @@
 
         public function toArray(){
             return [
+                'Id_Recette' => $this->Id_Recette ,
+                'login' => $this->login ,
                 'note' => $this->note ,
                 'specialite' => $this->specialite ,
                 'favori' => $this->favori 
