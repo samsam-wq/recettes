@@ -1,88 +1,74 @@
 <?php
-/**
- * Vue/recettes/lancer.php — Mode "Lancer la recette" pas à pas
- *
- * Technique CSS pur :
- *   On utilise des radio buttons cachés + le sélecteur :checked ~ .steps .step
- *   pour afficher une seule étape à la fois, sans JS.
- *
- * Variables attendues du contrôleur :
- *   array $recette  — ['id', 'nom', 'image', 'duree', 'personnes',
- *                       'etapes' => [['ordre','titre','description'], …],
- *                       'ingredients' => [['nom','quantite','unite'], …]]
- */
+use \frontend\Controleur\RecetteControleur;
+use \frontend\Controleur\EtapeControleur;
 
-if (empty($recette) || empty($recette['etapes'])) {
+$recetteControleur = RecetteControleur::getInstance();
+$etapeControleur   = EtapeControleur::getInstance();
+
+$reponse = $recetteControleur->laRecette($_GET['id'] ?? null);
+if ($reponse['status_code'] === 200) {
+    $recette = $reponse['data'];
+
+    $etapes = $etapeControleur->lesEtapesDuPlat($_GET['id']);
+    if ($etapes['status_code'] === 200) {
+        $etapes = $etapes['data'];
+    } else {
+        $etapes = null;
+    }
+} else {
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
-          <p class="empty-message">Aucune étape disponible pour cette recette.</p>
+          <p class="empty-message">Recette introuvable.</p>
           <a href="/recettes" class="btn btn--primary">Retour aux recettes</a></div>';
     return;
 }
 
-$id        = (int) $recette['id'];
-$nom       = htmlspecialchars($recette['nom']      ?? '');
-$duree     = htmlspecialchars($recette['duree']    ?? '');
-$personnes = (int)($recette['personnes']           ?? 0);
-$etapes    = $recette['etapes'];
-$nEtapes   = count($etapes);
+$id          = (int) $_GET['id'];
+$nom         = htmlspecialchars($recette['nom']   ?? '');
+$duree       = htmlspecialchars($recette['duree'] ?? '');
+$nEtapes     = count($etapes ?? []);
 $ingredients = $recette['ingredients'] ?? [];
 ?>
 
-<!-- ── CSS spécifique au mode pas-à-pas ────────────────────── -->
 <style>
-/* On cache tous les panels d'étapes par défaut */
 .step-panel { display: none; }
 
-/* Affiche le panel correspondant au radio coché */
 <?php for ($i = 1; $i <= $nEtapes; $i++): ?>
-#step-radio-<?= $i ?>:checked ~ .launcher-body .step-panel-<?= $i ?> { display: flex; }
-#step-radio-<?= $i ?>:checked ~ .launcher-nav .step-nav-btn[data-step="<?= $i ?>"] {
+.launcher-page:has(#step-radio-<?= $i ?>:checked) .step-panel-<?= $i ?> { display: flex; }
+.launcher-page:has(#step-radio-<?= $i ?>:checked) .step-nav-btn[data-step="<?= $i ?>"] {
     background-color: var(--clr-primary);
     color: #fff;
     border-color: var(--clr-primary);
 }
-#step-radio-<?= $i ?>:checked ~ .launcher-progress .progress-fill {
+.launcher-page:has(#step-radio-<?= $i ?>:checked) .progress-fill {
     width: <?= round(($i / $nEtapes) * 100) ?>%;
 }
+.launcher-page:has(#step-radio-<?= $i ?>:checked) .progress-label-<?= $i ?> { display: inline; }
 <?php endfor; ?>
 
-/* Masque les boutons Précédent/Suivant selon l'étape active */
-<?php for ($i = 1; $i <= $nEtapes; $i++): ?>
-#step-radio-<?= $i ?>:checked ~ .launcher-body .step-panel-<?= $i ?> .btn-prev-<?= $i ?>,
-#step-radio-<?= $i ?>:checked ~ .launcher-body .step-panel-<?= $i ?> .btn-next-<?= $i ?> {
-    display: inline-flex;
-}
-<?php endfor; ?>
-/* Masque le bouton Précédent sur étape 1 */
+.progress-step-label { display: none; }
 #step-radio-1:checked ~ .launcher-body .step-panel-1 .btn-prev-1 { display: none !important; }
-/* Masque le bouton Suivant sur la dernière étape */
-#step-radio-<?= $nEtapes ?>:checked ~ .launcher-body .step-panel-<?= $nEtapes ?> .btn-next-<?= $nEtapes ?> {
-    display: none !important;
-}
+#step-radio-<?= $nEtapes ?>:checked ~ .launcher-body .step-panel-<?= $nEtapes ?> .btn-next-<?= $nEtapes ?> { display: none !important; }
 </style>
-
-<!-- ── Radios cachés (état de la navigation) ─────────────────── -->
-<?php for ($i = 1; $i <= $nEtapes; $i++): ?>
-<input type="radio" name="step" id="step-radio-<?= $i ?>"
-       class="step-radio" <?= $i === 1 ? 'checked' : '' ?>>
-<?php endfor; ?>
 
 <div class="launcher-page">
 
-    <!-- En-tête -->
+    <!-- ✅ Radios DANS le conteneur pour que :has() fonctionne -->
+    <?php for ($i = 1; $i <= $nEtapes; $i++): ?>
+    <input type="radio" name="step" id="step-radio-<?= $i ?>"
+           class="step-radio" <?= $i === 1 ? 'checked' : '' ?>>
+    <?php endfor; ?>
+
     <div class="launcher-header">
-        <a href="/recettes/<?= $id ?>" class="launcher-back">← Retour à la recette</a>
+        <a href="/recettes/detail?id=<?= $id ?>" class="launcher-back">← Retour à la recette</a>
         <div class="launcher-title-wrap">
             <h1 class="launcher-title"><?= $nom ?></h1>
             <div class="launcher-meta">
                 <?php if ($duree): ?><span>⏱ <?= $duree ?> min</span><?php endif; ?>
-                <?php if ($personnes): ?><span>👤 <?= $personnes ?> pers.</span><?php endif; ?>
                 <span>📋 <?= $nEtapes ?> étape<?= $nEtapes > 1 ? 's' : '' ?></span>
             </div>
         </div>
     </div>
 
-    <!-- Barre de progression -->
     <div class="launcher-progress">
         <div class="progress-track">
             <div class="progress-fill"></div>
@@ -96,7 +82,6 @@ $ingredients = $recette['ingredients'] ?? [];
         </span>
     </div>
 
-    <!-- Numéros d'étapes (navigation) -->
     <nav class="launcher-nav">
         <?php for ($i = 1; $i <= $nEtapes; $i++): ?>
         <label for="step-radio-<?= $i ?>" class="step-nav-btn" data-step="<?= $i ?>"
@@ -106,23 +91,19 @@ $ingredients = $recette['ingredients'] ?? [];
         <?php endfor; ?>
     </nav>
 
-    <!-- Corps : panels d'étapes -->
     <div class="launcher-body">
-
         <?php foreach ($etapes as $i => $etape):
-            $num = $i + 1;
-            $titre = htmlspecialchars($etape['titre']       ?? "Étape $num");
-            $desc  = htmlspecialchars($etape['description'] ?? '');
+            $num   = $i + 1;
+            $titre = htmlspecialchars($etape['titre']   ?? "Étape $num");
+            $desc  = htmlspecialchars($etape['contenu'] ?? ''); // ✅ 'contenu' et non 'description'
         ?>
         <div class="step-panel step-panel-<?= $num ?>">
 
-            <!-- Colonne principale : étape -->
             <div class="step-main">
                 <div class="step-badge"><?= $num ?> / <?= $nEtapes ?></div>
                 <h2 class="step-title"><?= $titre ?></h2>
                 <p class="step-desc"><?= nl2br($desc) ?></p>
 
-                <!-- Navigation Précédent / Suivant -->
                 <div class="step-nav-controls">
                     <?php if ($num > 1): ?>
                     <label for="step-radio-<?= $num - 1 ?>"
@@ -137,15 +118,13 @@ $ingredients = $recette['ingredients'] ?? [];
                         Étape suivante →
                     </label>
                     <?php else: ?>
-                    <!-- Dernière étape : bouton terminer -->
-                    <a href="/recettes/<?= $id ?>" class="btn btn--launch">
+                    <a href="/recettes/detail?id=<?= $id ?>" class="btn btn--launch"> <!-- ✅ URL corrigée -->
                         ✅ Recette terminée !
                     </a>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <!-- Colonne latérale : ingrédients (rappel) -->
             <?php if (!empty($ingredients)): ?>
             <aside class="step-sidebar">
                 <h3 class="step-sidebar-title">🧂 Ingrédients</h3>
@@ -163,9 +142,8 @@ $ingredients = $recette['ingredients'] ?? [];
             </aside>
             <?php endif; ?>
 
-        </div><!-- /.step-panel -->
+        </div>
         <?php endforeach; ?>
+    </div>
 
-    </div><!-- /.launcher-body -->
-
-</div><!-- /.launcher-page -->
+</div>

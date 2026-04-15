@@ -116,7 +116,7 @@
                 try {
                     $statut = $etapeControleur->supprimeretapesRecette($id);
                     if ($statut) {
-                        $apiService->deliverResponse(201, "Donnees supprimée avec succes.");
+                        $apiService->deliverResponse(200, "Donnees supprimée avec succes.");
                     }else{
                         $apiService->deliverResponse(400, "Données non supprimées (problème inconnu)");
                     }

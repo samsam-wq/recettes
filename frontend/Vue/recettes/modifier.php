@@ -8,14 +8,29 @@
  *   array|null $old      — anciennes valeurs soumises (priorité sur $recette)
  */
 
+if (isset($_POST['add_etape'])){
+    header('Location: /recettes/ajouterEtape?id='.$_POST['id'].'&numero='.$_POST['add_etape']);
+    exit();
+}
+
 use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\NoterControleur;
+use \frontend\Controleur\EtapeControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
 $noterControleur = NoterControleur::getInstance();
+$etapeControleur = EtapeControleur::getInstance();
 
 $erreurs = array();
 $redirection = false;
+
+//TODO supprimer les ingrédient et ustenssiles utilisés
+if (isset($_POST['remove_etape'])){
+    $reponse = $etapeControleur->supprimerEtape($_POST['id'],$_POST['remove_etape']);
+    if ($reponse['status_code'] !== 200){
+        $erreurs[] = $reponse['status_message'];
+    }
+}
 
 if (
     isset($_POST['id']) && 
@@ -53,15 +68,32 @@ if (isset($_POST['id']) && isset($_POST['points'])) {
     }
 }
 
-if ($redirection) {
-    header('Location: /recettes');
-    exit();
-}
-
 $reponse = $recetteControleur->laRecette($_GET['id']);
 
 if ($reponse['status_code']==200) {
     $recette = $reponse['data'];
+
+    $etapes = $etapeControleur->lesEtapesDuPlat($_GET['id']);
+    if ($etapes['status_code']===200) {
+        $etapes = $etapes['data'];
+    }else{
+        $etapes = [];
+    }
+
+    for($i=0 ; $i<count($etapes) ; $i++){
+        if (isset($_POST['etapes'][$i+1]['titre']) && isset($_POST['etapes'][$i+1]['contenu'])){
+            $etape = $etapes[$i];
+            $update['titre'] = $_POST['etapes'][$i+1]['titre'];
+            $update['contenu'] = $_POST['etapes'][$i+1]['contenu'];
+            if ($etape['titre'] !== $update['titre'] || $etape['contenu'] !== $update['contenu']) {
+                $reponse = $etapeControleur->modifierEtape($update['titre'],$update['contenu'],($i+1),$_GET['id']);
+                if ($reponse['status_code']!==200){
+                    $erreurs[] = $reponse['status_message'];
+
+                }
+            }
+        }
+    }
 }else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
           <p class="empty-message">Recette introuvable.</p>
@@ -69,16 +101,22 @@ if ($reponse['status_code']==200) {
     return;
 }
 
+if ($redirection && empty($erreurs)) {
+    header('Location: /recettes');
+    exit();
+}
+
 $erreurs = $erreurs ?? [];
 // $old prend la priorité sur $recette pour re-peupler après une erreur de validation
 $data = array_merge($recette, $old ?? []);
+$dataEtape = array_merge($etapes,$old ?? []);
 if(isset($recette['notes'])){
     $dataNote = array_merge($recette['notes'], $oldNote ?? []);
 }
 
 $id          = (int)$recette['Id_recette'];
 $ingredients = $data['ingredients'] ?? $recette['ingredients'] ?? [['nom' => '', 'quantite' => '', 'unite' => '']];
-$etapes      = $data['etapes']      ?? $recette['etapes']      ?? [['titre' => '', 'description' => '']];
+$etapes      = $dataEtapes['etapes']      ?? $etapes     ?? [['titre' => '', 'description' => '']];
 
 function modVal(array $data, string $key, string $default = ''): string {
     return htmlspecialchars($data[$key] ?? $default);
@@ -201,19 +239,26 @@ function modVal(array $data, string $key, string $default = ''): string {
                 <div class="dynamic-row dynamic-row--etape">
                     <span class="etape-num-badge"><?= $idx + 1 ?></span>
                     <div class="dynamic-row-inputs dynamic-row-inputs--etape">
-                        <input type="text" name="etapes[<?= $idx ?>][titre]"
+                        <input type="text" name="etapes[<?= $idx+1 ?>][titre]"
                                placeholder="Titre de l'étape"
                                value="<?= htmlspecialchars($etape['titre'] ?? '') ?>">
-                        <textarea name="etapes[<?= $idx ?>][description]"
-                                  placeholder="Description…"><?= htmlspecialchars($etape['description'] ?? '') ?></textarea>
+                        <textarea name="etapes[<?= $idx+1 ?>][contenu]"
+                                  placeholder="Description…"><?= htmlspecialchars($etape['contenu'] ?? '') ?></textarea>
                     </div>
-                    <button type="submit" name="remove_etape" value="<?= $idx ?>"
+                    <button type="submit" name="remove_etape" value="<?= $idx + 1 ?>"
                             class="btn-remove" formnovalidate title="Supprimer">✕</button>
                 </div>
                 <?php endforeach; ?>
+                <?php 
+                    if(empty($etapes)){
+                        $idNouvelleEtape = $idx+1;
+                    }else{
+                        $idNouvelleEtape = $idx+2;
+                    }
+                ?>
             </div>
 
-            <button type="submit" name="add_etape" value="1"
+            <button type="submit" name="add_etape" value="<?=$idNouvelleEtape?>"
                     class="btn btn--ghost btn--add-row" formnovalidate>
                 ＋ Ajouter une étape
             </button>

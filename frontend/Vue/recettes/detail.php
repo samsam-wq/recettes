@@ -12,38 +12,39 @@
 
 use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\NoterControleur;
+use \frontend\Controleur\EtapeControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
 $noterControleur = NoterControleur::getInstance();
+$etapeControleur = EtapeControleur::getInstance();
 
-if (isset($_GET['id'])){
-    $id = $_GET['id'];
-}
+$id = $_GET['id'] ?? $_GET['idFav'] ?? $_GET['idSpe'] ?? null;
 
 if (isset($_GET['idFav'])){
-    $id = $_GET['idFav'];
     $reponse = $noterControleur->mettreOuEnleverEnfavori($_GET['idFav']);
-    if ($reponse['status_code']!=200) {
-        $erreur = $reponse['status_message'];
-    }
+    if ($reponse['status_code'] != 200) $erreur[] = $reponse['status_message'];
 }
 
 if (isset($_GET['idSpe'])){
-    $id = $_GET['idSpe'];
     $reponse = $noterControleur->mettreOuEnleverSpecialite($_GET['idSpe']);
-    if ($reponse['status_code']!=200) {
-        $erreur = $reponse['status_message'];
-    }
+    if ($reponse['status_code'] != 200) $erreur[] = $reponse['status_message'];
 }
 
 if (isset($id)){
     $reponse = $recetteControleur->laRecette($id);
-}else{
+} else {
     $reponse = $recetteControleur->getRecetteAleatoire();
 }
 
 if ($reponse['status_code']===200) {
     $recette = $reponse['data'];
+
+    $etapes = $etapeControleur->lesEtapesDuPlat($id);
+    if ($etapes['status_code']===200) {
+        $etapes = $etapes['data'];
+    }else{
+        $etapes = null;
+    }
 }else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
           <p class="empty-message">Recette introuvable.</p>
@@ -61,7 +62,6 @@ $image     = htmlspecialchars($recette['image']       ?? '');
 $favori    = ( $recette['notes']!==null && !empty($recette['notes']['favori']));
 $specialite    = ( $recette['notes']!==null && !empty($recette['notes']['specialite']));
 $ingredients = $recette['ingredients'] ?? [];
-$etapes      = $recette['etapes']      ?? [];
 
 $catClass = match(strtolower($recette['categorie'] ?? '')) {
     'plat', 'plat principal'  => 'card-category--main',
@@ -78,6 +78,14 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
         <span class="breadcrumb-sep">/</span>
         <span class="breadcrumb-current"><?= $nom ?></span>
     </nav>
+
+    <?php if (!empty($erreurs)): ?>
+    <div class="form-errors">
+        <?php foreach ($erreurs as $e): ?>
+            <p class="form-error-item">⚠️ <?= htmlspecialchars($e) ?></p>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
 
     <!-- ── Hero recette ───────────────────────────────────────── -->
     <div class="detail-hero">
@@ -186,14 +194,14 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
                         <?php if (!empty($etape['titre'])): ?>
                             <h3 class="etape-title"><?= htmlspecialchars($etape['titre']) ?></h3>
                         <?php endif; ?>
-                        <p class="etape-desc"><?= htmlspecialchars($etape['description'] ?? '') ?></p>
+                        <p class="etape-desc"><?= htmlspecialchars($etape['contenu'] ?? '') ?></p>
                     </div>
                 </li>
                 <?php endforeach; ?>
             </ol>
 
             <div style="margin-top:32px; text-align:center;">
-                <a href="/recettes/<?= $id ?>/lancer" class="btn btn--launch btn--launch-lg">
+                <a href="/recettes/lancer?id=<?= $id ?>" class="btn btn--launch btn--launch-lg">
                     ▶ Lancer la recette pas à pas
                 </a>
             </div>

@@ -39,7 +39,7 @@ if (
         }
         $reponse = $noterControleur->ajouterNote($id,$points,false,false);
         if ($reponse['status_code'] === 201){
-            header('Location: /recettes/ajouterEtape?id='.$id);
+            header('Location: /recettes/ajouterEtape?id='.$id.'&numero=1');
             exit();
         }else{
             $erreurs[] = $reponse['status_message'];

@@ -7,6 +7,42 @@
  *   array|null $old      — anciennes valeurs (re-population du form)
  */
 
+use \frontend\Controleur\EtapeControleur;;
+
+$etapeControleur = EtapeControleur::getInstance();
+
+$erreurs = array();
+$redirection = false;
+
+echo isset($_POST['contenu']) ;
+echo isset($_POST['titre']) ;
+echo isset($_GET['numero']);
+echo isset($_GET['id']);
+
+if (
+    isset($_POST['contenu']) && 
+    isset($_POST['titre']) && 
+    isset($_GET['numero']) && 
+    isset($_GET['id'])
+){
+    $reponse = $etapeControleur->ajouterEtape($_POST['titre'],$_POST['contenu'],$_GET['numero'],$_GET['id']);
+    if ($reponse['status_code'] === 201){
+        if (isset($_POST['recette'])){
+            header('Location: /recettes/modifier?id='.$_GET['id']);
+            exit();
+        }elseif (isset($_POST['etape'])){
+            header('Location: /recettes/ajouterEtape?id='.$_GET['id'].'&numero='.($_GET['numero']+1));
+            exit();
+        }
+    }else{
+        $erreurs[] = $reponse['status_message'];
+        $old['contenu'] = $_POST['contenu'];
+        $old['titre'] = $_POST['titre'];
+        $old['numero'] = $_GET['numero'];
+        $old['id'] = $_GET['id'];
+    }
+}
+
 $old    = $old    ?? [];
 $erreurs = $erreurs ?? [];
 
@@ -20,12 +56,12 @@ function oldVal(array $old, string $key, string $default = ''): string {
     <nav class="breadcrumb">
         <a href="/recettes" class="breadcrumb-link">← Toutes les recettes</a>
         <span class="breadcrumb-sep">/</span>
-        <span class="breadcrumb-current">Nouvelle recette</span>
+        <span class="breadcrumb-current">Nouvelle étape</span>
     </nav>
 
     <div class="form-page-header">
-        <h1 class="form-page-title">➕ Nouvelle recette</h1>
-        <p class="form-page-subtitle">Ajoute une recette à votre collection.</p>
+        <h1 class="form-page-title">➕ Nouvelle étape</h1>
+        <p class="form-page-subtitle">Ajoute une étape à la recette.</p>
     </div>
 
     <?php if (!empty($erreurs)): ?>
@@ -36,7 +72,7 @@ function oldVal(array $old, string $key, string $default = ''): string {
     </div>
     <?php endif; ?>
 
-    <form class="recipe-form" method="POST" action="/recettes/ajouter" enctype="multipart/form-data">
+    <form class="recipe-form" method="POST" action="/recettes/ajouterEtape?id=<?= $_GET['id'] ?>&numero=<?= $_GET['numero'] ?>" enctype="multipart/form-data">
 
         <!-- ── Étapes ─────────────────────────────────────────── -->
         <div class="form-card">
@@ -45,44 +81,27 @@ function oldVal(array $old, string $key, string $default = ''): string {
 
             <div class="dynamic-list" id="etapes-list">
                 <div class="dynamic-row dynamic-row--etape">
-                    <span class="etape-num-badge">1</span>
+                    <span class="etape-num-badge"><?= $_GET['numero'] ?></span>
                     <div class="dynamic-row-inputs dynamic-row-inputs--etape">
-                        <input type="text" name="etapes[0][titre]"
+                        <input type="text" name="titre"
                                placeholder="Titre de l'étape (ex : Préchauffer le four)"
-                               value="<?= oldVal($old, 'etapes[0][titre]') ?>">
-                        <textarea name="etapes[0][description]"
-                                  placeholder="Description détaillée de cette étape…"><?= oldVal($old, 'etapes[0][description]') ?></textarea>
+                               value="<?= htmlspecialchars(oldVal($old, 'titre'))?>">
+                        <textarea name="contenu"
+                                  placeholder="Description détaillée de cette étape…">
+                                  <?= htmlspecialchars(oldVal($old, 'contenu') ) ?></textarea>
                     </div>
                 </div>
-
-                <?php
-                if (!empty($old['etapes'])):
-                    foreach (array_slice($old['etapes'], 1, null, true) as $idx => $etape): ?>
-                <div class="dynamic-row dynamic-row--etape">
-                    <span class="etape-num-badge"><?= $idx + 1 ?></span>
-                    <div class="dynamic-row-inputs dynamic-row-inputs--etape">
-                        <input type="text" name="etapes[<?= $idx ?>][titre]"
-                               placeholder="Titre de l'étape"
-                               value="<?= htmlspecialchars($etape['titre'] ?? '') ?>">
-                        <textarea name="etapes[<?= $idx ?>][description]"
-                                  placeholder="Description…"><?= htmlspecialchars($etape['description'] ?? '') ?></textarea>
-                    </div>
-                </div>
-                    <?php endforeach;
-                endif; ?>
             </div>
-
-            <button type="submit" name="add_etape" value="1"
-                    class="btn btn--ghost btn--add-row" formnovalidate>
-                ＋ Ajouter une étape
-            </button>
         </div>
 
         <!-- ── Soumission ─────────────────────────────────────── -->
         <div class="form-submit-row">
             <a href="/recettes" class="btn btn--ghost">Annuler</a>
-            <button type="submit" name="save" value="1" class="btn btn--launch">
-                💾 Enregistrer la recette
+            <button type="submit" name="recette" value="1" class="btn btn--launch">
+                Retour à la recette
+            </button>
+            <button type="submit" name="etape" value="1" class="btn btn--launch">
+                Ajouter une autre étape
             </button>
         </div>
 
