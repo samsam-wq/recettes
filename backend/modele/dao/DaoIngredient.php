@@ -1,15 +1,23 @@
 <?php
-    namespace Backend\Modele\Dao;
+    namespace backend\Modele\dao;
 
-    use Backend\Modele\Dao\Bd\ConnexionBD;
+    use backend\modele\dao\bd\ConnexionBD;
+    use backend\modele\Ingredient;
     use PDO;
-    use Backend\Modele\Ingredient;
 
     class DaoIngredient implements Dao{
-        private $connexion;
+        private static ?DaoIngredient $instance = null;
+        private readonly PDO $connexion;
 
-        public function __construct (){
-            $this->connexion=ConnexionBD::getInstance()->pdo();
+        private function __construct() {
+            $this->connexion = ConnexionBD::getInstance()->pdo();
+        }
+
+        public static function getInstance(): DaoIngredient {
+            if (self::$instance == null) {
+                self::$instance = new DaoIngredient();
+            }
+            return self::$instance;
         }
 
         public function findAll():array{
@@ -30,22 +38,29 @@
             return $this->creerInstance($res);
         }
 
-        public function insert($donnee):bool{
+        public function insert($donnee):string{
+            $prix = $donnee->getPrix();
+            $image = $donnee->getImage();
+            $nom = $donnee->getNom();
             $req = $this->connexion->prepare('INSERT INTO Ingredient (prix, image, nom) VALUES (:prix, :image, :nom);');
-            $req->bindParam(':prix',$donnee->getPrix());
-            $req->bindParam(':image',$donnee->getImage());
-            $req->bindParam(':nom',$donnee->getNom());
+            $req->bindParam(':prix',$prix);
+            $req->bindParam(':image',$image);
+            $req->bindParam(':nom',$nom);
             return $req->execute();
         }
 
         public function update($donnee):bool{
+            $id = $donnee->getIdIngredient();
+            $prix = $donnee->getPrix();
+            $image = $donnee->getImage();
+            $nom = $donnee->getNom();
             $req = $this->connexion->prepare('UPDATE Ingredient 
                 SET prix=:prix, image=:image, nom=:nom
                 where Id_Ingredient = :id;');
-            $req->bindParam(':id',$donnee->getIdIngredient());
-            $req->bindParam(':prix',$donnee->getPrix());
-            $req->bindParam(':image',$donnee->getImage());
-            $req->bindParam(':nom',$donnee->getNom());
+            $req->bindParam(':id',$id);
+            $req->bindParam(':prix',$prix);
+            $req->bindParam(':image',$image);
+            $req->bindParam(':nom',$nom);
             return $req->execute();
         }
 

@@ -15,3 +15,8 @@ RewriteCond %{REQUEST_URI} !\.(css|jpg)$
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^Etape(/.*)?$    /Etape.php    [QSA,L]
+
+RewriteCond %{REQUEST_URI} !\.(css|jpg)$
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^Ustensile(/.*)?$    /Ustensile.php    [QSA,L]

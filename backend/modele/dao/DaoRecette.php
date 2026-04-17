@@ -1,5 +1,5 @@
 <?php
-    namespace backend\Modele\Dao;
+    namespace backend\Modele\dao;
 
     use backend\modele\RecetteCategorie;
     use backend\modele\dao\bd\ConnexionBD;
