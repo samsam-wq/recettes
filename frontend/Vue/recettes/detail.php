@@ -13,10 +13,12 @@
 use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\NoterControleur;
 use \frontend\Controleur\EtapeControleur;
+use \frontend\Controleur\UstensileControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
 $noterControleur = NoterControleur::getInstance();
 $etapeControleur = EtapeControleur::getInstance();
+$ustensileControleur = UstensileControleur::getInstance();
 
 $id = $_GET['id'] ?? $_GET['idFav'] ?? $_GET['idSpe'] ?? null;
 
@@ -42,8 +44,16 @@ if ($reponse['status_code']===200) {
     $etapes = $etapeControleur->lesEtapesDuPlat($id);
     if ($etapes['status_code']===200) {
         $etapes = $etapes['data'];
+
+        $ustensiles = $ustensileControleur->tousLesUstensileDeRecette($id);
+        if ($ustensiles['status_code']===200){
+            $ustensiles = $ustensiles['data'];
+        }else{
+            $ustensiles = null;
+        }
     }else{
         $etapes = null;
+        $ustensiles = null;
     }
 }else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
@@ -56,8 +66,6 @@ $id        = (int) $recette['Id_recette'];
 $nom       = htmlspecialchars($recette['nom']         ?? '');
 $categorie = htmlspecialchars($recette['categorie']   ?? '');
 $duree     = htmlspecialchars($recette['duree']       ?? '');
-$personnes = (int)($recette['personnes']              ?? 0);
-$desc      = htmlspecialchars($recette['description'] ?? '');
 $image     = htmlspecialchars($recette['image']       ?? '');
 $favori    = ( $recette['notes']!==null && !empty($recette['notes']['favori']));
 $specialite    = ( $recette['notes']!==null && !empty($recette['notes']['specialite']));
@@ -101,10 +109,6 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
         <div class="detail-hero-info">
             <h1 class="detail-title"><?= $nom ?></h1>
 
-            <?php if ($desc): ?>
-                <p class="detail-desc"><?= $desc ?></p>
-            <?php endif; ?>
-
             <!-- Méta -->
             <div class="detail-meta-row">
                 <?php if ($duree): ?>
@@ -129,6 +133,13 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
                 </div>
                 <?php endif; ?>
             </div>
+
+            <?php if ($ustensiles) : ?>
+                <h2 class="detail-section-title">🍴 Ustensiles :</h2>
+                <?php foreach ($ustensiles as $ustensile) : ?>
+                    <ul><?= $ustensile['nom'] ?> x <?= $ustensile['quantite'] ?></ul>
+                <?php endforeach; ?>
+            <?php endif; ?>
 
             <!-- Actions -->
             <div class="detail-actions">
@@ -188,12 +199,27 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
             <h2 class="detail-section-title">📋 Préparation</h2>
             <ol class="etapes-list">
                 <?php foreach ($etapes as $i => $etape): ?>
+                <?php 
+                    $ustensiles = $ustensileControleur->tousLesUstensileDeEtape($id,($i + 1));
+                    if ($ustensiles['status_code']===200){
+                        $ustensiles = $ustensiles['data'];
+                    }else{
+                        $ustensiles = null;
+                    }
+                ?>
                 <li class="etape-item">
                     <div class="etape-num"><?= $i + 1 ?></div>
                     <div class="etape-content">
-                        <?php if (!empty($etape['titre'])): ?>
-                            <h3 class="etape-title"><?= htmlspecialchars($etape['titre']) ?></h3>
-                        <?php endif; ?>
+                        <h3 class="etape-title"><?= htmlspecialchars($etape['titre']) ?? '' ?></h3>
+                        <?php 
+                            if ($ustensiles){
+                                echo '<ul>';
+                                foreach($ustensiles as $ustensile){
+                                    echo '<li>'. $ustensile['nom'] . 'x' . $ustensile['quantite'] .'</li>';
+                                }
+                                echo '</ul>';
+                            }
+                        ?>
                         <p class="etape-desc"><?= htmlspecialchars($etape['contenu'] ?? '') ?></p>
                     </div>
                 </li>

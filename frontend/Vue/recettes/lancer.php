@@ -1,9 +1,11 @@
 <?php
 use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\EtapeControleur;
+use \frontend\Controleur\UstensileControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
 $etapeControleur   = EtapeControleur::getInstance();
+$ustensileControleur = UstensileControleur::getInstance();
 
 $reponse = $recetteControleur->laRecette($_GET['id'] ?? null);
 if ($reponse['status_code'] === 200) {
@@ -125,8 +127,18 @@ $ingredients = $recette['ingredients'] ?? [];
                 </div>
             </div>
 
-            <?php if (!empty($ingredients)): ?>
+            <?php 
+                $ustensiles = $ustensileControleur->tousLesUstensileDeEtape($id,$num);
+                if ($ustensiles['status_code']===200){
+                    $ustensiles = $ustensiles['data'];
+                }else{
+                    $ustensiles = null;
+                }
+            ?>
+
+            <?php if (!empty($ingredients) || !empty($ustensiles)): ?>
             <aside class="step-sidebar">
+                <?php if (!empty($ingredients)): ?>
                 <h3 class="step-sidebar-title">🧂 Ingrédients</h3>
                 <ul class="step-ingredients">
                     <?php foreach ($ingredients as $ing): ?>
@@ -139,6 +151,21 @@ $ingredients = $recette['ingredients'] ?? [];
                     </li>
                     <?php endforeach; ?>
                 </ul>
+                <?php endif; ?>
+
+                <?php if (!empty($ustensiles)): ?>
+                <h3 class="step-sidebar-title">🍴 Ustensiles</h3>
+                <ul class="step-ingredients">
+                    <?php foreach ($ustensiles as $ustensile): ?>
+                    <li class="step-ingredient">
+                        <span><?= htmlspecialchars($ustensile['nom'] ?? '') ?></span>
+                        <span class="step-ingredient-qty">
+                            <?= htmlspecialchars($ustensile['quantite'] ?? '') ?>
+                        </span>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php endif; ?>
             </aside>
             <?php endif; ?>
 

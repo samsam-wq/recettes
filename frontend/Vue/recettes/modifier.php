@@ -16,10 +16,12 @@ if (isset($_POST['add_etape'])){
 use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\NoterControleur;
 use \frontend\Controleur\EtapeControleur;
+use \frontend\Controleur\UstensileControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
 $noterControleur = NoterControleur::getInstance();
 $etapeControleur = EtapeControleur::getInstance();
+$ustensileControleur = UstensileControleur::getInstance();
 
 $erreurs = array();
 $redirection = false;
@@ -93,6 +95,13 @@ if ($reponse['status_code']==200) {
                 }
             }
         }
+    }
+
+    $tousLesUstensiles = $ustensileControleur->tousLesUstensile();
+    if ($tousLesUstensiles['status_code']===200) {
+        $tousLesUstensiles = $tousLesUstensiles['data'];
+    }else{
+        $tousLesUstensiles = [];
     }
 }else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
@@ -200,42 +209,20 @@ function modVal(array $data, string $key, string $default = ''): string {
             </div>
         </div>
 
-        <!-- ── Ingrédients ────────────────────────────────────── -->
-        <div class="form-card">
-            <h2 class="form-card-title">🧂 Ingrédients</h2>
-
-            <div class="dynamic-list">
-                <?php foreach ($ingredients as $idx => $ing): ?>
-                <div class="dynamic-row">
-                    <div class="dynamic-row-inputs">
-                        <input type="text" name="ingredients[<?= $idx ?>][nom]"
-                               placeholder="Ingrédient" class="input-ingredient-nom"
-                               value="<?= htmlspecialchars($ing['nom'] ?? '') ?>">
-                        <input type="text" name="ingredients[<?= $idx ?>][quantite]"
-                               placeholder="Quantité" class="input-ingredient-qty"
-                               value="<?= htmlspecialchars($ing['quantite'] ?? '') ?>">
-                        <input type="text" name="ingredients[<?= $idx ?>][unite]"
-                               placeholder="Unité" class="input-ingredient-unit"
-                               value="<?= htmlspecialchars($ing['unite'] ?? '') ?>">
-                    </div>
-                    <button type="submit" name="remove_ingredient" value="<?= $idx ?>"
-                            class="btn-remove" formnovalidate title="Supprimer">✕</button>
-                </div>
-                <?php endforeach; ?>
-            </div>
-
-            <button type="submit" name="add_ingredient" value="1"
-                    class="btn btn--ghost btn--add-row" formnovalidate>
-                ＋ Ajouter un ingrédient
-            </button>
-        </div>
-
         <!-- ── Étapes ─────────────────────────────────────────── -->
         <div class="form-card">
             <h2 class="form-card-title">📋 Étapes de préparation</h2>
 
             <div class="dynamic-list">
                 <?php foreach ($etapes as $idx => $etape): ?>
+                <?php 
+                    $ustensiles = $ustensileControleur->tousLesUstensileDeEtape($id,($idx + 1));
+                    if ($ustensiles['status_code']===200){
+                        $ustensiles = $ustensiles['data'];
+                    }else{
+                        $ustensiles = null;
+                    }
+                ?>
                 <div class="dynamic-row dynamic-row--etape">
                     <span class="etape-num-badge"><?= $idx + 1 ?></span>
                     <div class="dynamic-row-inputs dynamic-row-inputs--etape">
@@ -243,7 +230,27 @@ function modVal(array $data, string $key, string $default = ''): string {
                                placeholder="Titre de l'étape"
                                value="<?= htmlspecialchars($etape['titre'] ?? '') ?>">
                         <textarea name="etapes[<?= $idx+1 ?>][contenu]"
-                                  placeholder="Description…"><?= htmlspecialchars($etape['contenu'] ?? '') ?></textarea>
+                                placeholder="Description…"><?= htmlspecialchars($etape['contenu'] ?? '') ?></textarea>
+                        <?php 
+                            if ($ustensiles){
+                                echo '<ul>';
+                                foreach($ustensiles as $ustensile){
+                                    echo '<li>'. $ustensile['nom'] . 'x' . $ustensile['quantite'] .'</li>';
+                                }
+                                echo '</ul>';
+                            }
+                        ?>
+                        <select name="add_ustensile_id">
+                            <option value ="0"> Pas d'ustensile</option>
+                        <?php 
+                            foreach($tousLesUstensiles as $ustensile){
+                                echo '<option value ="'.$ustensile['Id_Ustensiles'].'">'. $ustensile['nom'] .'</option>';
+                            }
+                        ?>
+                        </select>
+                        <button type="submit" name="add_ustensile" value=""
+                            class="btn btn--ghost btn--add-row" formnovalidate>
+                            ＋ Ajouter un ustensile</button>
                     </div>
                     <button type="submit" name="remove_etape" value="<?= $idx + 1 ?>"
                             class="btn-remove" formnovalidate title="Supprimer">✕</button>
