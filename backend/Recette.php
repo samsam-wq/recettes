@@ -101,7 +101,7 @@
                 $data['groupe']
             );
             if ($id) {
-                $apiService->deliverResponse(200, "Donnees insérée avec succes.",$id);
+                $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
             }else{
                 $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
             }

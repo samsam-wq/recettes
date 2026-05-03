@@ -30,7 +30,7 @@ if (
         $_POST['image'],
         $_SESSION['groupe']
     );
-    if ($reponse['status_code'] === 200){
+    if ($reponse['status_code'] === 201){
         $id = $reponse['data'];
         //ajout note
         $points=1;
@@ -38,7 +38,7 @@ if (
             $points = $_POST['points'];
         }
         $reponse = $noterControleur->ajouterNote($id,$points,false,false);
-        if ($reponse['status_code'] === 200){
+        if ($reponse['status_code'] === 201){
             header('Location: /recettes/ajouterEtape?id='.$id.'&numero=1');
             exit();
         }else{

@@ -219,7 +219,7 @@
                 try {
                     $id = $ustensileControleur->modifierUstensile($Id_Ustensile,$data['nom']);
                     if ($id) {
-                        $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
+                        $apiService->deliverResponse(200, "Donnees modifiée avec succes.",$id);
                     }else{
                         $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
                     }
@@ -238,7 +238,7 @@
                         $numero,
                         $data['quantite']);
                     if ($id) {
-                        $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
+                        $apiService->deliverResponse(200, "Donnees modifiée avec succes.",$id);
                     }else{
                         $apiService->deliverResponse(400, "Données non insérées (problème inconnu)");
                     }

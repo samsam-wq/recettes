@@ -56,6 +56,6 @@ class UstensileControleur {
         $payload = [
             'nom' => $nom
         ];
-        return $this->apiServide->callApi($this->url,"POST",$payload,array(null,null,null,$id));
+        return $this->apiServide->callApi($this->url,"PUT",$payload,array(null,null,null,$id));
     }
 }

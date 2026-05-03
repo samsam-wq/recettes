@@ -53,7 +53,16 @@ if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION
         <div class="dropdown">
             <button class="dropbtn">Recettes ▾</button>
             <div class="dropdown-content">
+                <a href="/recettes">Toutes les Recettes</a>
                 <a href="/recettes/ajouter">➕ Ajouter une Recette</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">Ustensiles ▾</button>
+            <div class="dropdown-content">
+                <a href="/ustensiles">Tous les Ustensiles</a>
+                <a href="/ustensiles/ajouter">➕ Ajouter un Ustensile</a>
             </div>
         </div>
 
