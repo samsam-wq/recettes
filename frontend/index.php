@@ -53,8 +53,9 @@ if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION
         <div class="dropdown">
             <button class="dropbtn">Recettes ▾</button>
             <div class="dropdown-content">
-                <a href="/recettes">Toutes les Recettes</a>
+                <a href="/recettes">Toutes mes Recettes</a>
                 <a href="/recettes/ajouter">➕ Ajouter une Recette</a>
+                <a href="/recettesPublic">Toutes les Recettes</a>
             </div>
         </div>
 
@@ -67,9 +68,13 @@ if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION
         </div>
 
         <?php if (isset($_SESSION['login'])) : ?>
-        <a href="/logout" class="nav-cta" style="margin-left:auto;">
-            👋 <?php echo htmlspecialchars($_SESSION['login']); ?>
-        </a>
+            <div class="nav-cta dropdown">
+                <button class="dropbtn">👋 <?php echo htmlspecialchars($_SESSION['login']); ?></button>
+                <div class="dropdown-content">
+                    <a href="/">Inviter/Rejoindre</a>
+                    <a href="/">Déconexion</a>
+                </div>
+            </div>
         <?php endif; ?>
 
     </div>

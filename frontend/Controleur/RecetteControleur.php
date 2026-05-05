@@ -47,6 +47,10 @@ class RecetteControleur {
         return $this->apiServide->callApi($this->url,"GET");
     }
 
+    public function toutesLesRecettes():array{
+        return $this->apiServide->callApi($this->url,"GET",null,array("all"));
+    }
+
     public function laRecette(int $Id_recette):array{
         return $this->apiServide->callApi($this->url,"GET",null,array($Id_recette));
     }

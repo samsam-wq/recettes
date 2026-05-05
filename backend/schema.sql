@@ -148,7 +148,7 @@ INSERT INTO Recette (nom, duree, categorie, image, groupe) VALUES
     ('Pâtes carbonara',            20,  'Plat', 'carbonara.jpg',       1),
     ('Saumon citron-crème',        25,  'Plat', 'saumon.jpg',          1),
     ('Ratatouille',                45,  'Plat', 'ratatouille.jpg',     1),
-    ('Omelette aux champignons',   15,  'Plat', 'omelette.jpg',        1);
+    ('Omelette aux champignons',   15,  'Plat', 'omelette.jpg',        2);
 
 -- ---------------------------------------------
 -- Etapes
