@@ -25,20 +25,26 @@ class UtiliseControleur {
         int $Id_Recette,
         int $numero,
         float $quantite
-    ):bool{
-        return $this->utilises->insert(new Utilise($Id_Ustensiles,$Id_Recette,$numero,$quantite)); 
+    ):array{
+        $payload = [
+            'Id_Ustensiles' => $Id_Ustensiles,
+            'Id_Recette' => $Id_Recette,
+            'numero' => $numero,
+            'quantite' => $quantite
+        ];
+        return $this->apiServide->callApi($this->url,"POST",$payload,array("etape"));
     }
 
-    public function supprimerUtilise(int $Id_Ustensiles,int $Id_Recette,int $numero):bool{
-        return $this->utilises->delete(array($Id_Ustensiles, $Id_Recette, $numero));
+    public function supprimerUtilise(int $Id_Ustensiles,int $Id_Recette,int $numero):array{
+        return $this->apiServide->callApi($this->url,"DELETE",null,array("etape",$Id_Recette,$numero,$Id_Ustensiles));
     }
 
-    public function supprimerUtiliseEtape(int $Id_Recette,int $numero):bool{
-        return $this->utilises->deleteDeEtape(array($Id_Recette, $numero));
+    public function supprimerUtiliseEtape(int $Id_Recette,int $numero):array{
+        return $this->apiServide->callApi($this->url,"DELETE",null,array("etape",$Id_Recette,$numero,null));
     }
 
-    public function supprimerUtiliseRecette(int $Id_Recette):bool{
-        return $this->utilises->deleteDeRecette($Id_Recette);
+    public function supprimerUtiliseRecette(int $Id_Recette):array{
+        return $this->apiServide->callApi($this->url,"DELETE",null,array("recette",$Id_Recette,null,null));
     }
 
     public function modifierUtilise(
@@ -46,7 +52,10 @@ class UtiliseControleur {
         int $Id_Recette,
         int $numero,
         float $quantite
-    ):bool{
-        return $this->utilises->update(new Utilise($Id_Ustensiles,$Id_Recette,$numero,$quantite));
+    ):array{
+        $payload = [
+            'quantite' => $quantite
+        ];
+        return $this->apiServide->callApi($this->url,"PUT",$payload,array("etape",$Id_Recette,$numero,$Id_Ustensiles));
     }
 }

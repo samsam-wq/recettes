@@ -34,6 +34,16 @@ if (isset($_POST['remove_etape'])){
     }
 }
 
+if (isset($_POST['edit_etape'])){
+    $reponse = $etapeControleur->supprimerEtape($_POST['id'],$_POST['edit_etape']);
+    header('Location: /recettes/modifierEtape?id='.$_POST['id'].'&numero='.$_POST['edit_etape']);
+    exit();
+}
+
+if (isset($_POST['add_ustensile'])){
+    
+}
+
 if (
     isset($_POST['id']) && 
     isset($_POST['nom']) && 
@@ -80,21 +90,6 @@ if ($reponse['status_code']==200) {
         $etapes = $etapes['data'];
     }else{
         $etapes = [];
-    }
-
-    for($i=0 ; $i<count($etapes) ; $i++){
-        if (isset($_POST['etapes'][$i+1]['titre']) && isset($_POST['etapes'][$i+1]['contenu'])){
-            $etape = $etapes[$i];
-            $update['titre'] = $_POST['etapes'][$i+1]['titre'];
-            $update['contenu'] = $_POST['etapes'][$i+1]['contenu'];
-            if ($etape['titre'] !== $update['titre'] || $etape['contenu'] !== $update['contenu']) {
-                $reponse = $etapeControleur->modifierEtape($update['titre'],$update['contenu'],($i+1),$_GET['id']);
-                if ($reponse['status_code']!==200){
-                    $erreurs[] = $reponse['status_message'];
-
-                }
-            }
-        }
     }
 
     $tousLesUstensiles = $ustensileControleur->tousLesUstensile();
@@ -226,11 +221,8 @@ function modVal(array $data, string $key, string $default = ''): string {
                 <div class="dynamic-row dynamic-row--etape">
                     <span class="etape-num-badge"><?= $idx + 1 ?></span>
                     <div class="dynamic-row-inputs dynamic-row-inputs--etape">
-                        <input type="text" name="etapes[<?= $idx+1 ?>][titre]"
-                               placeholder="Titre de l'étape"
-                               value="<?= htmlspecialchars($etape['titre'] ?? '') ?>">
-                        <textarea name="etapes[<?= $idx+1 ?>][contenu]"
-                                placeholder="Description…"><?= htmlspecialchars($etape['contenu'] ?? '') ?></textarea>
+                        <h3><?= htmlspecialchars($etape['titre'] ?? '') ?></h3>
+                        <p><?= htmlspecialchars($etape['contenu'] ?? '') ?></p>
                         <?php 
                             if ($ustensiles){
                                 echo '<ul>';
@@ -240,20 +232,11 @@ function modVal(array $data, string $key, string $default = ''): string {
                                 echo '</ul>';
                             }
                         ?>
-                        <select name="add_ustensile_id">
-                            <option value ="0"> Pas d'ustensile</option>
-                        <?php 
-                            foreach($tousLesUstensiles as $ustensile){
-                                echo '<option value ="'.$ustensile['Id_Ustensiles'].'">'. $ustensile['nom'] .'</option>';
-                            }
-                        ?>
-                        </select>
-                        <button type="submit" name="add_ustensile" value=""
-                            class="btn btn--ghost btn--add-row" formnovalidate>
-                            ＋ Ajouter un ustensile</button>
                     </div>
                     <button type="submit" name="remove_etape" value="<?= $idx + 1 ?>"
                             class="btn-remove" formnovalidate title="Supprimer">✕</button>
+                    <button type="submit" name="edit_etape" value="<?= $idx + 1 ?>"
+                            class="btn-edit" formnovalidate title="Edit">✏️</button>
                 </div>
                 <?php endforeach; ?>
                 <?php 

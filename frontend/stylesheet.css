@@ -1270,7 +1270,7 @@ li { display: table; }
 .progress-step-label { display: none; }
 
 /* Afficher le label correspondant à l'étape active */
-<?php /* généré dynamiquement dans la vue lancer.php */ ?>
+/* généré dynamiquement dans la vue lancer.php */
 
 /* Navigation numéros */
 .launcher-nav {
@@ -1541,6 +1541,48 @@ input[type=number]:focus {
     transition: background-color var(--transition), transform var(--transition);
 }
 .btn-remove:hover { background-color: var(--clr-danger); color: #fff; transform: scale(1.1); }
+
+.btn-remove-inline {
+    display: inline-flex;
+    margin-left: 5px;
+    margin-bottom: 15px;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(192,57,43,.3);
+    background-color: var(--clr-danger-lt);
+    color: var(--clr-danger);
+    font-size: .75rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: background-color var(--transition), transform var(--transition);
+}
+.btn-remove-inline:hover { background-color: var(--clr-danger); color: #fff; transform: scale(1.1); }
+
+.btn-edit {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(239,162,0,.3);
+    background-color: var(--clr-warning-lt);
+    color: var(--clr-warning);
+    font-size: .85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 10px;
+    padding: 0;
+    transition: background-color var(--transition), transform var(--transition);
+    text-decoration: none;
+}
+.btn-edit:hover { background-color: var(--clr-warning); color: #fff; transform: scale(1.1); }
 
 /* Bouton ajouter une ligne */
 .btn--add-row {

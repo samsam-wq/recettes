@@ -14,11 +14,6 @@ $etapeControleur = EtapeControleur::getInstance();
 $erreurs = array();
 $redirection = false;
 
-echo isset($_POST['contenu']) ;
-echo isset($_POST['titre']) ;
-echo isset($_GET['numero']);
-echo isset($_GET['id']);
-
 if (
     isset($_POST['contenu']) && 
     isset($_POST['titre']) && 
