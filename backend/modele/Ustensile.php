@@ -10,7 +10,6 @@
             $this->Id_Ustensiles=$Id_Ustensiles;
             $this->nom=$nom;
             $this->quantite=$quantite;
-
         }
 
         public function toArray(){

@@ -38,27 +38,55 @@
             return $this->creerInstance($res);
         }
 
+        public function findByIdEtape($id):array{
+            $req = $this->connexion->prepare('SELECT nom,image,quantite,Ingredient.Id_Ingredient,unite FROM Ingredient 
+                JOIN contient ON contient.Id_Ingredient = Ingredient.Id_Ingredient
+                where contient.Id_Recette = :id
+                and contient.numero= :numero;');
+            $req->bindParam(':id', $id[0]);
+            $req->bindParam(':numero', $id[1]);
+            $req->execute();
+            $res = $req->fetchAll(PDO::FETCH_ASSOC);
+            $ustensiles = array();
+            foreach ( $res as $raw){
+                $ustensiles[] = $this->creerInstance($raw);
+            }
+            return $ustensiles;
+        }
+
+        public function findByIdRecette($id):array{
+            $req = $this->connexion->prepare('SELECT Ingredient.nom,Ingredient.Id_Ingredient,Ingredient.image,contient.unite,SUM(contient.quantite)AS quantite FROM Ingredient 
+                JOIN contient ON contient.Id_Ingredient = Ingredient.Id_Ingredient
+                where contient.Id_Recette = :id
+                group by Ingredient.nom,Ingredient.Id_Ingredient,Ingredient.image,contient.unite');
+            $req->bindParam(':id', $id);
+            $req->execute();
+            $res = $req->fetchAll(PDO::FETCH_ASSOC);
+            $ustensiles = array();
+            foreach ( $res as $raw){
+                $ustensiles[] = $this->creerInstance($raw);
+            }
+            return $ustensiles;
+        }
+
         public function insert($donnee):string{
-            $prix = $donnee->getPrix();
             $image = $donnee->getImage();
             $nom = $donnee->getNom();
-            $req = $this->connexion->prepare('INSERT INTO Ingredient (prix, image, nom) VALUES (:prix, :image, :nom);');
-            $req->bindParam(':prix',$prix);
+            $req = $this->connexion->prepare('INSERT INTO Ingredient ( image, nom) VALUES ( :image, :nom);');
             $req->bindParam(':image',$image);
             $req->bindParam(':nom',$nom);
-            return $req->execute();
+            $req->execute();
+            return $this->connexion->lastInsertId();
         }
 
         public function update($donnee):bool{
             $id = $donnee->getIdIngredient();
-            $prix = $donnee->getPrix();
             $image = $donnee->getImage();
             $nom = $donnee->getNom();
             $req = $this->connexion->prepare('UPDATE Ingredient 
-                SET prix=:prix, image=:image, nom=:nom
+                SET image=:image, nom=:nom
                 where Id_Ingredient = :id;');
             $req->bindParam(':id',$id);
-            $req->bindParam(':prix',$prix);
             $req->bindParam(':image',$image);
             $req->bindParam(':nom',$nom);
             return $req->execute();
@@ -76,9 +104,16 @@
             }
             $Id_Ingredient = $raw['Id_Ingredient'];
             $nom = $raw['nom'];
-            $prix = $raw['prix'];
             $image = $raw['image'];
-            $ingredient = new Ingredient($Id_Ingredient,$nom,$prix,$image);
+            $unite = null;
+            if (isset($raw['unite'])){
+                $unite = $raw['unite'];
+            }
+            $quantite = null;
+            if (isset($raw['quantite'])){
+                $quantite = $raw['quantite'];
+            }
+            $ingredient = new Ingredient($Id_Ingredient,$nom,$image,$quantite,$unite);
             return $ingredient;
         }
     }

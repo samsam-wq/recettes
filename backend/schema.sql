@@ -20,7 +20,6 @@ CREATE TABLE Ustensiles(
 
 CREATE TABLE Ingredient(
    Id_Ingredient INT AUTO_INCREMENT,
-   prix VARCHAR(50) ,
    image VARCHAR(50) ,
    nom VARCHAR(50) ,
    PRIMARY KEY(Id_Ingredient)
@@ -117,27 +116,27 @@ INSERT INTO Ustensiles (nom) VALUES
 -- ---------------------------------------------
 -- Ingrédients
 -- ---------------------------------------------
-INSERT INTO Ingredient (prix, image, nom) VALUES
-    ('1.20', 'oignon.jpg', 'Oignon'),
-    ('2.50', 'poulet.jpg', 'Blanc de poulet'),
-    ('0.80', 'ail.jpg', 'Ail'),
-    ('1.50', 'tomate.jpg', 'Tomate'),
-    ('3.00', 'pate_feuilletee.jpg', 'Pâte feuilletée'),
-    ('4.50', 'gruyere.jpg', 'Gruyère râpé'),
-    ('1.00', 'oeuf.jpg', 'Œuf'),
-    ('0.90', 'farine.jpg', 'Farine'),
-    ('1.20', 'beurre.jpg', 'Beurre'),
-    ('0.60', 'lait.jpg', 'Lait'),
-    ('2.80', 'lardons.jpg', 'Lardons'),
-    ('0.50', 'sel.jpg', 'Sel'),
-    ('0.50', 'poivre.jpg', 'Poivre'),
-    ('1.80', 'pates.jpg', 'Pâtes'),
-    ('3.50', 'saumon.jpg', 'Pavé de saumon'),
-    ('1.10', 'citron.jpg', 'Citron'),
-    ('2.00', 'creme.jpg', 'Crème fraîche'),
-    ('0.70', 'carotte.jpg', 'Carotte'),
-    ('1.30', 'courgette.jpg', 'Courgette'),
-    ('2.20', 'champignon.jpg', 'Champignons de Paris');
+INSERT INTO Ingredient (image, nom) VALUES
+    ('oignon.jpg', 'Oignon'),
+    ('poulet.jpg', 'Blanc de poulet'),
+    ('ail.jpg', 'Ail'),
+    ('tomate.jpg', 'Tomate'),
+    ('pate_feuilletee.jpg', 'Pâte feuilletée'),
+    ('gruyere.jpg', 'Gruyère râpé'),
+    ('oeuf.jpg', 'Œuf'),
+    ('farine.jpg', 'Farine'),
+    ('beurre.jpg', 'Beurre'),
+    ('lait.jpg', 'Lait'),
+    ('lardons.jpg', 'Lardons'),
+    ('sel.jpg', 'Sel'),
+    ('poivre.jpg', 'Poivre'),
+    ('pates.jpg', 'Pâtes'),
+    ('saumon.jpg', 'Pavé de saumon'),
+    ('citron.jpg', 'Citron'),
+    ('creme.jpg', 'Crème fraîche'),
+    ('carotte.jpg', 'Carotte'),
+    ('courgette.jpg', 'Courgette'),
+    ('champignon.jpg', 'Champignons de Paris');
 
 -- ---------------------------------------------
 -- Recettes

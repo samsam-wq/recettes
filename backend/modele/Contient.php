@@ -22,6 +22,16 @@
             $this->unite=$unite;
         }
 
+        public function toArray(){
+            return[
+                'Id_Ingredient' => $this->Id_Ingredient ,
+                'Id_Recette' => $this->Id_Recette,
+                'numero' => $this->numero,
+                'quantite' => $this->quantite,
+                'unite' => $this->unite
+            ];
+        }
+
         public function getIdIngredient():int{
             return $this->Id_Ingredient ;
         }
