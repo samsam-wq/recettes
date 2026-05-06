@@ -2,10 +2,13 @@
 use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\EtapeControleur;
 use \frontend\Controleur\UstensileControleur;
+use \frontend\Controleur\IngredientControleur;
 
+$ingredientControleur = IngredientControleur::getInstance();
 $recetteControleur = RecetteControleur::getInstance();
 $etapeControleur   = EtapeControleur::getInstance();
 $ustensileControleur = UstensileControleur::getInstance();
+$ingredientControleur = IngredientControleur::getInstance();
 
 $reponse = $recetteControleur->laRecette($_GET['id'] ?? null);
 if ($reponse['status_code'] === 200) {
@@ -28,7 +31,6 @@ $id          = (int) $_GET['id'];
 $nom         = htmlspecialchars($recette['nom']   ?? '');
 $duree       = htmlspecialchars($recette['duree'] ?? '');
 $nEtapes     = count($etapes ?? []);
-$ingredients = $recette['ingredients'] ?? [];
 ?>
 
 <style>
@@ -133,6 +135,13 @@ $ingredients = $recette['ingredients'] ?? [];
                     $ustensiles = $ustensiles['data'];
                 }else{
                     $ustensiles = null;
+                }
+
+                $ingredients = $ingredientControleur->tousLesIngredientDeEtape($id,$num);
+                if ($ingredients['status_code']===200){
+                    $ingredients = $ingredients['data'];
+                }else{
+                    $ingredients = null;
                 }
             ?>
 

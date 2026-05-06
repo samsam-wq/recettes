@@ -21,10 +21,9 @@ class IngredientControleur {
     }
 
     public function ajouterIngredient(
-        string $nom,
-        string $image
+        string $nom
     ):string{
-        return $this->ingredients->insert(new Ingredient(0,$nom,$image)); 
+        return $this->ingredients->insert(new Ingredient(0,$nom)); 
     }
 
     public function supprimerIngredient(int $id):bool{
@@ -49,9 +48,8 @@ class IngredientControleur {
 
     public function modifierIngredient(
         int $id,
-        string $nom,
-        string $image
+        string $nom
     ):bool{
-        return $this->ingredients->update(new Ingredient($id,$nom,$image));
+        return $this->ingredients->update(new Ingredient($id,$nom));
     }
 }

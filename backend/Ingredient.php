@@ -94,12 +94,8 @@
                     $apiService->deliverResponse(400, "Champs nom manquant");
                     break;
                 }
-                if (empty($data['nom'])) {
-                    $apiService->deliverResponse(400, "Champs image manquant");
-                    break;
-                }
                 try {
-                    $id = $ingredientControleur->ajouterIngredient($data['nom'],$data['image']);
+                    $id = $ingredientControleur->ajouterIngredient($data['nom']);
                     if ($id) {
                         $apiService->deliverResponse(201, "Donnees insérée avec succes.",$id);
                     }else{
@@ -110,7 +106,7 @@
                 }
             }elseif(!empty($type) && $type==="etape"){
                 $champsManquants = [];
-                if (empty($data['Id_Ingredients'])) $champsManquants[] = 'Id_Ingredients';
+                if (empty($data['Id_Ingredient'])) $champsManquants[] = 'Id_Ingredient';
                 if (empty($data['Id_Recette'])) $champsManquants[] = 'Id_Recette';
                 if (empty($data['numero'])) $champsManquants[] = 'numero';
                 if (empty($data['quantite'])) $champsManquants[] = 'quantite';
@@ -122,7 +118,7 @@
                 }
                 try {
                     $id = $contientControleur->ajouterContient(
-                        $data['Id_Ingredients'],
+                        $data['Id_Ingredient'],
                         $data['Id_Recette'],
                         $data['numero'],
                         $data['quantite'],
@@ -222,12 +218,8 @@
                     $apiService->deliverResponse(400, "Champs nom manquant");
                     break;
                 }
-                if (empty($data['image'])) {
-                    $apiService->deliverResponse(400, "Champs nom manquant");
-                    break;
-                }
                 try {
-                    $id = $ingredientControleur->modifierIngredient($Id_Ingredient,$data['nom'],$data['image']);
+                    $id = $ingredientControleur->modifierIngredient($Id_Ingredient,$data['nom']);
                     if ($id) {
                         $apiService->deliverResponse(200, "Donnees modifiée avec succes.",$id);
                     }else{

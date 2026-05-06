@@ -1,9 +1,13 @@
 <?php
 use \frontend\Controleur\EtapeControleur;
 use \frontend\Controleur\UstensileControleur;
+use \frontend\Controleur\IngredientControleur;
 use \frontend\Controleur\UtiliseControleur;
+use \frontend\Controleur\ContientControleur;
 
+$contientControleur = ContientControleur::getInstance();
 $utiliseControleur = UtiliseControleur::getInstance();
+$ingredientControleur = IngredientControleur::getInstance();
 $ustensileControleur = UstensileControleur::getInstance();
 $etapeControleur = EtapeControleur::getInstance();
 
@@ -16,12 +20,13 @@ if (!isset($_GET['id']) || !isset($_GET['numero'])){
 
 if (isset($_POST['delete'])){
     $reponse = $utiliseControleur->supprimerUtiliseEtape($_GET['id'],$_GET['numero']);
-    //TODO supprimer ingrédients
+    $reponse = $contientControleur->supprimerContientEtape($_GET['id'],$_GET['numero']);
     $reponse = $etapeControleur->supprimerEtape($_GET['id'],$_GET['numero']);
     if ($reponse['status_code'] === 200){
         header('Location: /recettes/modifier?id='.$_GET['id']);
         exit();
     }else{
+        echo $reponse['status_code'];
         $erreurs[] = $reponse['status_message'];
     }
 }
@@ -59,6 +64,27 @@ if (isset($_POST['remove_ustensile'])){
     }
 }
 
+if (isset($_POST['add_ingredient_id']) && $_POST['add_ingredient_id'] != 0 && isset($_POST['add_ingredient'])){
+    $reponse = $contientControleur->ajouterContient($_POST['add_ingredient_id'],$_GET['id'],$_GET['numero'],$_POST['quantite'],$_POST['unite']);
+    if ($reponse['status_code'] !== 201) {
+        $erreurs[] = $reponse['status_message'];
+    }
+}
+
+if (isset($_POST['del_all_ingredient'])){
+    $reponse = $contientControleur->supprimerContientEtape($_GET['id'],$_GET['numero']);
+    if ($reponse['status_code'] !== 200) {
+        $erreurs[] = $reponse['status_message'];
+    }
+}
+
+if (isset($_POST['remove_ingredient'])){
+    $reponse = $contientControleur->supprimerContient($_POST['remove_ingredient'],$_GET['id'],$_GET['numero']);
+    if ($reponse['status_code'] !== 200) {
+        $erreurs[] = $reponse['status_message'];
+    }
+}
+
 $reponse = $etapeControleur->lEtape($_GET['id'], $_GET['numero']);
 if ($reponse['status_code'] == 200) {
     $etape = $reponse['data'];
@@ -75,6 +101,20 @@ if ($reponse['status_code'] == 200) {
         $ustensiles = $ustensiles['data'];
     }else{
         $ustensiles = [];
+    }
+
+    $tousLesIngredients = $ingredientControleur->tousLesIngredient();
+    if ($tousLesIngredients['status_code']===200) {
+        $tousLesIngredients = $tousLesIngredients['data'];
+    }else{
+        $tousLesIngredients = [];
+    }
+
+    $ingredients = $ingredientControleur->tousLesIngredientDeEtape($_GET['id'], $_GET['numero']);
+    if ($ingredients['status_code']===200) {
+        $ingredients = $ingredients['data'];
+    }else{
+        $ingredients = [];
     }
 }else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
@@ -131,6 +171,44 @@ function modVal(array $data, string $key, string $default = ''): string {
                 </div>
             </div>
         </div>
+
+        <div class="form-card">
+            <h2 class="form-card-title">🧂 Ingrédients</h2>
+            <?php if ($ingredients) : ?>
+                <?php foreach($ingredients as $ingredient) : ?>
+                    <ul>
+                        <div style="display: flex">
+                            <li><?= htmlspecialchars($ingredient['nom']) ?> x <?= htmlspecialchars($ingredient['quantite']) ?> </li>
+                            <button type="submit" name="remove_ingredient" value="<?= htmlspecialchars($ingredient['Id_Ingredient']) ?>"
+                            class="btn-remove-inline" formnovalidate title="Supprimer">✕</button>
+                        </div>
+                    </ul>
+                <?php endforeach;?>
+            <?php endif; ?>
+            <div style="display: flex">
+                <select name="add_ingredient_id">
+                    <option value ="0">Pas d'ingredient</option>
+                    <?php 
+                        foreach($tousLesIngredients as $ingredient){
+                            echo '<option value ="'.$ingredient['Id_Ingredient'].'">'. $ingredient['nom'] .'</option>';
+                        }
+                    ?>
+                </select>
+                <p style="margin : 5px"> x </p>
+                <input type="number" name="quantite" min="1" step="1" 
+                    placeholder="1" value="1">
+                <input type="text" name="unite"
+                    placeholder="g" value="g">
+            </div>
+            <button type="submit" name="add_ingredient" value=""
+                class="btn btn--ghost btn--add-row" formnovalidate>
+                ＋ Ajouter un ingredient</button>
+            <?php if (!empty($ingredients)) : ?>
+            <button type="submit" name="del_all_ingredient" value=""
+                class="btn btn--ghost btn--add-row" formnovalidate>
+                Supprimer tous les ingredients</button>
+            <?php endif; ?>
+        </div>  
 
         <div class="form-card">
             <h2 class="form-card-title">🍴 Ustensiles</h2>

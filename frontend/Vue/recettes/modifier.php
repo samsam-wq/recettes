@@ -17,7 +17,13 @@ use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\NoterControleur;
 use \frontend\Controleur\EtapeControleur;
 use \frontend\Controleur\UstensileControleur;
+use \frontend\Controleur\IngredientControleur;
+use \frontend\Controleur\UtiliseControleur;
+use \frontend\Controleur\ContientControleur;
 
+$contientControleur = ContientControleur::getInstance();
+$utiliseControleur = UtiliseControleur::getInstance();
+$ingredientControleur = IngredientControleur::getInstance();
 $recetteControleur = RecetteControleur::getInstance();
 $noterControleur = NoterControleur::getInstance();
 $etapeControleur = EtapeControleur::getInstance();
@@ -26,22 +32,29 @@ $ustensileControleur = UstensileControleur::getInstance();
 $erreurs = array();
 $redirection = false;
 
-//TODO supprimer les ingrédient et ustenssiles utilisés
-if (isset($_POST['remove_etape'])){
+
+if (isset($_POST['remove_etape'])){//supprime etape
+    $reponse = $utiliseControleur->supprimerUtiliseEtape($_POST['id'],$_POST['remove_etape']);
+    if ($reponse['status_code'] !== 200){
+        $erreurs[] = $reponse['status_message'];
+    }
+
+    $reponse = $contientControleur->supprimerContientEtape($_POST['id'],$_POST['remove_etape']);
+    if ($reponse['status_code'] !== 200){
+        $erreurs[] = $reponse['status_message'];
+    }
+
     $reponse = $etapeControleur->supprimerEtape($_POST['id'],$_POST['remove_etape']);
     if ($reponse['status_code'] !== 200){
         $erreurs[] = $reponse['status_message'];
     }
 }
 
-if (isset($_POST['edit_etape'])){
+
+if (isset($_POST['edit_etape'])){//envoie vers modifier etape
     $reponse = $etapeControleur->supprimerEtape($_POST['id'],$_POST['edit_etape']);
     header('Location: /recettes/modifierEtape?id='.$_POST['id'].'&numero='.$_POST['edit_etape']);
     exit();
-}
-
-if (isset($_POST['add_ustensile'])){
-    
 }
 
 if (
@@ -50,7 +63,7 @@ if (
     isset($_POST['duree']) && 
     isset($_POST['categorie']) &&
     isset($_POST['image']) 
-){
+){//modifie la recette
     $reponse = $recetteControleur->modifierRecette(
         $_POST['id'],
         $_POST['nom'],
@@ -70,7 +83,7 @@ if (
     }
 }
 
-if (isset($_POST['id']) && isset($_POST['points'])) {
+if (isset($_POST['id']) && isset($_POST['points'])) {//modifie les points
     $reponse = $noterControleur->modifierNoteNote($_POST['id'],$_POST['points']);
     if ($reponse['status_code'] === 200){
         $redirection = true;
@@ -80,23 +93,17 @@ if (isset($_POST['id']) && isset($_POST['points'])) {
     }
 }
 
+//recup recette
 $reponse = $recetteControleur->laRecette($_GET['id']);
-
 if ($reponse['status_code']==200) {
     $recette = $reponse['data'];
 
+    //recup etapes
     $etapes = $etapeControleur->lesEtapesDuPlat($_GET['id']);
     if ($etapes['status_code']===200) {
         $etapes = $etapes['data'];
     }else{
         $etapes = [];
-    }
-
-    $tousLesUstensiles = $ustensileControleur->tousLesUstensile();
-    if ($tousLesUstensiles['status_code']===200) {
-        $tousLesUstensiles = $tousLesUstensiles['data'];
-    }else{
-        $tousLesUstensiles = [];
     }
 }else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
@@ -119,7 +126,6 @@ if(isset($recette['notes'])){
 }
 
 $id          = (int)$recette['Id_recette'];
-$ingredients = $data['ingredients'] ?? $recette['ingredients'] ?? [['nom' => '', 'quantite' => '', 'unite' => '']];
 $etapes      = $dataEtapes['etapes']      ?? $etapes     ?? [['titre' => '', 'description' => '']];
 
 function modVal(array $data, string $key, string $default = ''): string {
@@ -217,6 +223,13 @@ function modVal(array $data, string $key, string $default = ''): string {
                     }else{
                         $ustensiles = null;
                     }
+
+                    $ingredients = $ingredientControleur->tousLesIngredientDeEtape($id,($idx + 1));
+                    if ($ingredients['status_code']===200){
+                        $ingredients = $ingredients['data'];
+                    }else{
+                        $ingredients = null;
+                    }
                 ?>
                 <div class="dynamic-row dynamic-row--etape">
                     <span class="etape-num-badge"><?= $idx + 1 ?></span>
@@ -227,7 +240,15 @@ function modVal(array $data, string $key, string $default = ''): string {
                             if ($ustensiles){
                                 echo '<ul>';
                                 foreach($ustensiles as $ustensile){
-                                    echo '<li>'. $ustensile['nom'] . 'x' . $ustensile['quantite'] .'</li>';
+                                    echo '<li>'. $ustensile['nom'] . ' x ' . $ustensile['quantite'] .'</li>';
+                                }
+                                echo '</ul>';
+                            }
+
+                            if ($ingredients){
+                                echo '<ul>';
+                                foreach($ingredients as $ingredient){
+                                    echo '<li>'. $ingredient['nom'] . ' x ' . $ingredient['quantite'] . " " . $ingredient['unite'] .'</li>';
                                 }
                                 echo '</ul>';
                             }

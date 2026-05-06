@@ -6,15 +6,15 @@
  *   array  $recettes  — liste des recettes à afficher
  *   int    $total     — nombre total de résultats
  */
-use \frontend\Controleur\UstensileControleur;
+use \frontend\Controleur\IngredientControleur;
 
-$ustensileControleur = UstensileControleur::getInstance();
+$ingredientControleur = IngredientControleur::getInstance();
 
-$ustensiles =$ustensileControleur->tousLesUstensile();
-if ($ustensiles['status_code'] === 200){
-    $ustensiles = $ustensiles['data'];
+$ingredients =$ingredientControleur->tousLesIngredient();
+if ($ingredients['status_code'] === 200){
+    $ingredients = $ingredients['data'];
 }else{
-    $ustensiles=[];
+    $ingredients=[];
 }
 
 if (isset($_GET['erreur'])){
@@ -32,7 +32,7 @@ if (isset($_GET['erreur'])){
 <section class="controls-bar">
     <div class="controls-inner">
 
-        <a href="/ustensiles/ajouter" class="btn btn--add">➕ Ajouter</a>
+        <a href="/ingredients/ajouter" class="btn btn--add">➕ Ajouter</a>
 
     </div>
 </section>
@@ -48,9 +48,9 @@ if (isset($_GET['erreur'])){
     <!-- GRILLE -->
     <section class="recipes-section">
 
-        <?php if (!empty($ustensiles)): ?>
+        <?php if (!empty($ingredients)): ?>
         <div class="recipes-grid">
-            <?php foreach ($ustensiles as $u): ?>
+            <?php foreach ($ingredients as $u): ?>
             <article class="recipe-card">
 
                 <div class="card-body">
@@ -58,7 +58,7 @@ if (isset($_GET['erreur'])){
                         <?= htmlspecialchars($u['nom']) ?>
                     </h3>
                     <div class="card-actions">
-                        <a href="./ustensiles/modifier?id=<?= (int)$u['Id_Ustensiles'] ?>" class="card-btn card-btn--edit">✏️</a>
+                        <a href="./ingredients/modifier?id=<?= (int)$u['Id_Ingredient'] ?>" class="card-btn card-btn--edit">✏️</a>
                     </div>
                 </div>
             </article>

@@ -20,7 +20,6 @@ CREATE TABLE Ustensiles(
 
 CREATE TABLE Ingredient(
    Id_Ingredient INT AUTO_INCREMENT,
-   image VARCHAR(50) ,
    nom VARCHAR(50) ,
    PRIMARY KEY(Id_Ingredient)
 );
@@ -75,25 +74,6 @@ CREATE TABLE Noter(
    FOREIGN KEY(Id_Recette) REFERENCES Recette(Id_Recette)
 );
 
-CREATE TABLE Contient_R(
-   Id_Ingredient INT,
-   Id_Recette INT,
-   quantite INT,
-   unite VARCHAR(50) ,
-   PRIMARY KEY(Id_Ingredient, Id_Recette),
-   FOREIGN KEY(Id_Ingredient) REFERENCES Ingredient(Id_Ingredient),
-   FOREIGN KEY(Id_Recette) REFERENCES Recette(Id_Recette)
-);
-
-CREATE TABLE Utilise_R(
-   Id_Ustensiles INT,
-   Id_Recette INT,
-   quantite INT,
-   PRIMARY KEY(Id_Ustensiles, Id_Recette),
-   FOREIGN KEY(Id_Ustensiles) REFERENCES Ustensiles(Id_Ustensiles),
-   FOREIGN KEY(Id_Recette) REFERENCES Recette(Id_Recette)
-);
-
 -- =============================================
 -- JEU DE DONNÉES - Base Recettes
 -- =============================================
@@ -116,27 +96,27 @@ INSERT INTO Ustensiles (nom) VALUES
 -- ---------------------------------------------
 -- Ingrédients
 -- ---------------------------------------------
-INSERT INTO Ingredient (image, nom) VALUES
-    ('oignon.jpg', 'Oignon'),
-    ('poulet.jpg', 'Blanc de poulet'),
-    ('ail.jpg', 'Ail'),
-    ('tomate.jpg', 'Tomate'),
-    ('pate_feuilletee.jpg', 'Pâte feuilletée'),
-    ('gruyere.jpg', 'Gruyère râpé'),
-    ('oeuf.jpg', 'Œuf'),
-    ('farine.jpg', 'Farine'),
-    ('beurre.jpg', 'Beurre'),
-    ('lait.jpg', 'Lait'),
-    ('lardons.jpg', 'Lardons'),
-    ('sel.jpg', 'Sel'),
-    ('poivre.jpg', 'Poivre'),
-    ('pates.jpg', 'Pâtes'),
-    ('saumon.jpg', 'Pavé de saumon'),
-    ('citron.jpg', 'Citron'),
-    ('creme.jpg', 'Crème fraîche'),
-    ('carotte.jpg', 'Carotte'),
-    ('courgette.jpg', 'Courgette'),
-    ('champignon.jpg', 'Champignons de Paris');
+INSERT INTO Ingredient (nom) VALUES
+    ('Oignon'),
+    ('Blanc de poulet'),
+    ('Ail'),
+    ('Tomate'),
+    ('Pâte feuilletée'),
+    ('Gruyère râpé'),
+    ('Œuf'),
+    ('Farine'),
+    ('Beurre'),
+    ('Lait'),
+    ('Lardons'),
+    ('Sel'),
+    ('Poivre'),
+    ('Pâtes'),
+    ('Pavé de saumon'),
+    ('Citron'),
+    ('Crème fraîche'),
+    ('Carotte'),
+    ('Courgette'),
+    ('Champignons de Paris');
 
 -- ---------------------------------------------
 -- Recettes
@@ -244,49 +224,6 @@ INSERT INTO Contient (Id_Ingredient, Id_Recette, numero, quantite, unite) VALUES
     (13, 6, 3, 1,   'pincée');    -- Poivre - étape 3
 
 -- ---------------------------------------------
--- Contient_R (ingrédients globaux par recette)
--- ---------------------------------------------
-INSERT INTO Contient_R (Id_Ingredient, Id_Recette, quantite, unite) VALUES
-    -- Poulet rôti
-    (2,  1, 1,   'pièce'),
-    (3,  1, 4,   'gousses'),
-    (9,  1, 30,  'g'),
-    (12, 1, 1,   'pincée'),
-    (13, 1, 1,   'pincée'),
-    -- Quiche lorraine
-    (5,  2, 1,   'pièce'),
-    (7,  2, 3,   'pièces'),
-    (17, 2, 200, 'ml'),
-    (11, 2, 150, 'g'),
-    (6,  2, 100, 'g'),
-    -- Pâtes carbonara
-    (14, 3, 400, 'g'),
-    (11, 3, 200, 'g'),
-    (7,  3, 3,   'pièces'),
-    (6,  3, 80,  'g'),
-    (12, 3, 1,   'pincée'),
-    (13, 3, 1,   'pincée'),
-    -- Saumon citron-crème
-    (15, 4, 2,   'pièces'),
-    (16, 4, 1,   'pièce'),
-    (17, 4, 150, 'ml'),
-    (9,  4, 20,  'g'),
-    (12, 4, 1,   'pincée'),
-    -- Ratatouille
-    (19, 5, 2,   'pièces'),
-    (4,  5, 3,   'pièces'),
-    (1,  5, 2,   'pièces'),
-    (3,  5, 2,   'gousses'),
-    (12, 5, 1,   'pincée'),
-    (13, 5, 1,   'pincée'),
-    -- Omelette aux champignons
-    (20, 6, 200, 'g'),
-    (7,  6, 4,   'pièces'),
-    (9,  6, 20,  'g'),
-    (12, 6, 1,   'pincée'),
-    (13, 6, 1,   'pincée');
-
--- ---------------------------------------------
 -- Utilise (ustensiles par étape)
 -- ---------------------------------------------
 INSERT INTO Utilise (Id_Ustensiles, Id_Recette, numero, quantite) VALUES
@@ -309,28 +246,6 @@ INSERT INTO Utilise (Id_Ustensiles, Id_Recette, numero, quantite) VALUES
     -- Omelette aux champignons
     (1,  6, 2, 1),   -- Poêle - étape 2
     (1,  6, 3, 1);   -- Poêle - étape 3
-
--- ---------------------------------------------
--- Utilise_R (ustensiles globaux par recette)
--- ---------------------------------------------
-INSERT INTO Utilise_R (Id_Ustensiles, Id_Recette, quantite) VALUES
-    -- Poulet rôti
-    (3,  1, 1),   -- Four
-    -- Quiche lorraine
-    (7,  2, 1),   -- Fouet
-    (3,  2, 1),   -- Four
-    -- Pâtes carbonara
-    (2,  3, 1),   -- Casserole
-    (1,  3, 1),   -- Poêle
-    (6,  3, 1),   -- Saladier
-    -- Saumon citron-crème
-    (1,  4, 1),   -- Poêle
-    -- Ratatouille
-    (4,  5, 1),   -- Couteau de chef
-    (5,  5, 1),   -- Planche à découper
-    (1,  5, 1),   -- Poêle
-    -- Omelette aux champignons
-    (1,  6, 1);   -- Poêle
 
 -- ---------------------------------------------
 -- Noter

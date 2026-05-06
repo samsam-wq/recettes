@@ -3,13 +3,27 @@
 use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\NoterControleur;
 use \frontend\Controleur\EtapeControleur;
+use \frontend\Controleur\UtiliseControleur;
+use \frontend\Controleur\ContientControleur;
 
+$contientControleur = ContientControleur::getInstance();
+$utiliseControleur = UtiliseControleur::getInstance();
 $recetteControleur = RecetteControleur::getInstance();
 $noterControleur = NoterControleur::getInstance();
 $etapeControleur = EtapeControleur::getInstance();
 
 if (isset($_GET['delete'])){
-    //TODO supprimer les dependances
+    $reponse = $utiliseControleur->supprimerUtiliseRecette($_GET['delete']);
+    if ($reponse['status_code']!==200) {
+        header('Location: /recettes?erreur='.$reponse['status_message']);
+        exit();
+    }
+
+    $reponse = $contientControleur->supprimerContientRecette($_GET['delete']);
+    if ($reponse['status_code']!==200) {
+        header('Location: /recettes?erreur='.$reponse['status_message']);
+        exit();
+    }
 
     $reponse = $etapeControleur->supprimeretapesRecette($_GET['delete']);
     if ($reponse['status_code']!==200) {

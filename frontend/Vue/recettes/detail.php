@@ -14,46 +14,55 @@ use \frontend\Controleur\RecetteControleur;
 use \frontend\Controleur\NoterControleur;
 use \frontend\Controleur\EtapeControleur;
 use \frontend\Controleur\UstensileControleur;
+use \frontend\Controleur\IngredientControleur;
 
 $recetteControleur = RecetteControleur::getInstance();
 $noterControleur = NoterControleur::getInstance();
 $etapeControleur = EtapeControleur::getInstance();
 $ustensileControleur = UstensileControleur::getInstance();
+$ingredientControleur = IngredientControleur::getInstance();
 
 $id = $_GET['id'] ?? $_GET['idFav'] ?? $_GET['idSpe'] ?? null;
 
-if (isset($_GET['idFav'])){
+if (isset($_GET['idFav'])){//mettre/enlever en favoris
     $reponse = $noterControleur->mettreOuEnleverEnfavori($_GET['idFav']);
     if ($reponse['status_code'] != 200) $erreur[] = $reponse['status_message'];
 }
 
-if (isset($_GET['idSpe'])){
+if (isset($_GET['idSpe'])){//mettre/enlever en specialite
     $reponse = $noterControleur->mettreOuEnleverSpecialite($_GET['idSpe']);
     if ($reponse['status_code'] != 200) $erreur[] = $reponse['status_message'];
 }
 
-if (isset($id)){
-    $reponse = $recetteControleur->laRecette($id);
-} else {
-    $reponse = $recetteControleur->getRecetteAleatoire();
-}
-
+//recup recette
+$reponse = $recetteControleur->laRecette($id);
 if ($reponse['status_code']===200) {
     $recette = $reponse['data'];
 
+    //recup etapes
     $etapes = $etapeControleur->lesEtapesDuPlat($id);
     if ($etapes['status_code']===200) {
         $etapes = $etapes['data'];
 
+        //recup ustensiles
         $ustensiles = $ustensileControleur->tousLesUstensileDeRecette($id);
         if ($ustensiles['status_code']===200){
             $ustensiles = $ustensiles['data'];
         }else{
             $ustensiles = null;
         }
+
+        //recup ingredients
+        $ingredients = $ingredientControleur->tousLesIngredientDeRecette($id);
+        if ($ingredients['status_code']===200){
+            $ingredients = $ingredients['data'];
+        }else{
+            $ingredients = null;
+        }
     }else{
         $etapes = null;
         $ustensiles = null;
+        $ingredients = null;
     }
 }else{
     echo '<div class="empty-state"><span class="empty-icon">😕</span>
@@ -69,7 +78,6 @@ $duree     = htmlspecialchars($recette['duree']       ?? '');
 $image     = htmlspecialchars($recette['image']       ?? '');
 $favori    = ( $recette['notes']!==null && !empty($recette['notes']['favori']));
 $specialite    = ( $recette['notes']!==null && !empty($recette['notes']['specialite']));
-$ingredients = $recette['ingredients'] ?? [];
 
 $catClass = match(strtolower($recette['categorie'] ?? '')) {
     'plat', 'plat principal'  => 'card-category--main',
