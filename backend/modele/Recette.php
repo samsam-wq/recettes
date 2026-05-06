@@ -1,5 +1,5 @@
 <?php
-    namespace Backend\Modele;
+    namespace backend\modele;
 
     use backend\modele\RecetteCategorie;
     use backend\modele\Noter;

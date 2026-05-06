@@ -1,5 +1,5 @@
 <?php
-    namespace Backend\Modele;
+    namespace backend\modele;
 
     class Contient{
         private int $Id_Ingredient;

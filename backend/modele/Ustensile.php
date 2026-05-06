@@ -1,5 +1,5 @@
 <?php
-    namespace Backend\Modele;
+    namespace backend\modele;
 
     class Ustensile{
         private ?int $Id_Ustensiles;

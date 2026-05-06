@@ -1,5 +1,5 @@
 <?php
-    namespace backend\Modele\dao;
+    namespace backend\modele\dao;
 
     use backend\modele\dao\bd\ConnexionBD;
     use backend\modele\Ingredient;
@@ -40,9 +40,9 @@
 
         public function findByIdEtape($id):array{
             $req = $this->connexion->prepare('SELECT nom,quantite,Ingredient.Id_Ingredient,unite FROM Ingredient 
-                JOIN contient ON contient.Id_Ingredient = Ingredient.Id_Ingredient
-                where contient.Id_Recette = :id
-                and contient.numero= :numero;');
+                JOIN Contient ON Contient.Id_Ingredient = Ingredient.Id_Ingredient
+                where Contient.Id_Recette = :id
+                and Contient.numero= :numero;');
             $req->bindParam(':id', $id[0]);
             $req->bindParam(':numero', $id[1]);
             $req->execute();
@@ -55,10 +55,10 @@
         }
 
         public function findByIdRecette($id):array{
-            $req = $this->connexion->prepare('SELECT Ingredient.nom,Ingredient.Id_Ingredient,contient.unite,SUM(contient.quantite)AS quantite FROM Ingredient 
-                JOIN contient ON contient.Id_Ingredient = Ingredient.Id_Ingredient
-                where contient.Id_Recette = :id
-                group by Ingredient.nom,Ingredient.Id_Ingredient,contient.unite');
+            $req = $this->connexion->prepare('SELECT Ingredient.nom,Ingredient.Id_Ingredient,Contient.unite,SUM(Contient.quantite)AS quantite FROM Ingredient 
+                JOIN Contient ON Contient.Id_Ingredient = Ingredient.Id_Ingredient
+                where Contient.Id_Recette = :id
+                group by Ingredient.nom,Ingredient.Id_Ingredient,Contient.unite');
             $req->bindParam(':id', $id);
             $req->execute();
             $res = $req->fetchAll(PDO::FETCH_ASSOC);

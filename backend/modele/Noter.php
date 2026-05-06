@@ -1,5 +1,5 @@
 <?php
-    namespace Backend\Modele;
+    namespace backend\modele;
 
     class Noter{
         private int $Id_Recette;

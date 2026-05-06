@@ -1,6 +1,6 @@
 <?php
 
-namespace Backend\Controleur;
+namespace backend\controleur;
 
 use backend\modele\dao\DaoUtilise;
 use backend\modele\Utilise;

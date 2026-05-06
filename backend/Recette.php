@@ -9,7 +9,7 @@
     $loader->addNamespace('backend\\', $_SERVER['DOCUMENT_ROOT']);
 
     use backend\Service\ApiService;
-    use backend\Controleur\RecetteControleur;
+    use backend\controleur\RecetteControleur;
     use backend\modele\RecetteCategorie;
 
     $apiService = ApiService::getInstance();

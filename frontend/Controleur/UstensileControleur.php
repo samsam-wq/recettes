@@ -7,7 +7,7 @@ use frontend\Service\ApiService;
 class UstensileControleur {
     private static ?UstensileControleur $instance = null;
     private readonly ApiService $apiServide;
-    private string $url = "http://backend.test/Ustensile";
+    private string $url = "https://apirecettes.alwaysdata.net/Ustensile";
 
     private function __construct() {
         $this->apiServide = ApiService::getInstance();

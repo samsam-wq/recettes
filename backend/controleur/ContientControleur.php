@@ -1,6 +1,6 @@
 <?php
 
-namespace Backend\Controleur;
+namespace backend\controleur;
 
 use backend\modele\dao\DaoContient;
 use backend\modele\Contient;

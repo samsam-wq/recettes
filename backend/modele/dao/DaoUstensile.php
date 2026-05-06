@@ -1,5 +1,5 @@
 <?php
-    namespace backend\Modele\dao;
+    namespace backend\modele\dao;
 
     use backend\modele\dao\bd\ConnexionBD;
     use backend\modele\Ustensile;
@@ -40,9 +40,9 @@
 
         public function findByIdEtape($id):array{
             $req = $this->connexion->prepare('SELECT nom,quantite,Ustensiles.Id_Ustensiles FROM Ustensiles 
-                JOIN utilise ON utilise.Id_Ustensiles = Ustensiles.Id_Ustensiles
-                where utilise.Id_Recette = :id
-                and utilise.numero= :numero ;');
+                JOIN Utilise ON Utilise.Id_Ustensiles = Ustensiles.Id_Ustensiles
+                where Utilise.Id_Recette = :id
+                and Utilise.numero= :numero ;');
             $req->bindParam(':id', $id[0]);
             $req->bindParam(':numero', $id[1]);
             $req->execute();
@@ -55,9 +55,9 @@
         }
 
         public function findByIdRecette($id):array{
-            $req = $this->connexion->prepare('SELECT Ustensiles.nom,SUM(utilise.quantite)AS quantite FROM Ustensiles 
-                JOIN utilise ON utilise.Id_Ustensiles = Ustensiles.Id_Ustensiles 
-                where utilise.Id_Recette = :id
+            $req = $this->connexion->prepare('SELECT Ustensiles.nom,SUM(Utilise.quantite)AS quantite FROM Ustensiles 
+                JOIN Utilise ON Utilise.Id_Ustensiles = Ustensiles.Id_Ustensiles 
+                where Utilise.Id_Recette = :id
                 group by Ustensiles.nom;');
             $req->bindParam(':id', $id);
             $req->execute();

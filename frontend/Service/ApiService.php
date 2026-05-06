@@ -81,7 +81,7 @@ class ApiService
     public function isTokenValid($token):bool {
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, "https://lafrontt.alwaysdata.net/");
+        curl_setopt($ch, CURLOPT_URL, "https://lafront.alwaysdata.net/");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "Authorization: Bearer ".$token,

@@ -1,5 +1,5 @@
 <?php
-    namespace backend\Modele\dao;
+    namespace backend\modele\dao;
 
     use backend\modele\dao\bd\ConnexionBD;
     use backend\modele\Contient;
