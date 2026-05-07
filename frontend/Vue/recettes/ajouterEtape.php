@@ -83,9 +83,11 @@ function oldVal(array $old, string $key, string $default = ''): string {
                     <div class="dynamic-row-inputs dynamic-row-inputs--etape">
                         <input type="text" name="titre"
                                placeholder="Titre de l'étape (ex : Préchauffer le four)"
-                               value="<?= htmlspecialchars(oldVal($old, 'titre'))?>">
+                               value="<?= htmlspecialchars(oldVal($old, 'titre'))?>"
+                               required>
                         <textarea name="contenu"
-                                  placeholder="Description détaillée de cette étape…">
+                                  placeholder="Description détaillée de cette étape…"
+                                  required>
                                   <?= htmlspecialchars(oldVal($old, 'contenu') ) ?></textarea>
                     </div>
                 </div>

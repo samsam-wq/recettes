@@ -165,9 +165,11 @@ function modVal(array $data, string $key, string $default = ''): string {
                 <div class="dynamic-row-inputs dynamic-row-inputs--etape">
                     <input type="text" name="titre"
                            placeholder="Titre de l'étape"
-                           value="<?= modVal($data, 'titre') ?>">
+                           value="<?= modVal($data, 'titre') ?>
+                           required">
                     <textarea name="contenu"
-                              placeholder="Description détaillée de cette étape…"><?= modVal($data, 'contenu') ?></textarea>
+                              placeholder="Description détaillée de cette étape…"
+                              required><?= modVal($data, 'contenu') ?></textarea>
                 </div>
             </div>
         </div>
@@ -196,9 +198,11 @@ function modVal(array $data, string $key, string $default = ''): string {
                 </select>
                 <p style="margin : 5px"> x </p>
                 <input type="number" name="quantite" min="1" step="1" 
-                    placeholder="1" value="1">
+                    placeholder="1" value="1"
+                    required>
                 <input type="text" name="unite"
-                    placeholder="g" value="g">
+                    placeholder="g" value="g"
+                    required>
             </div>
             <button type="submit" name="add_ingredient" value=""
                 class="btn btn--ghost btn--add-row" formnovalidate>
@@ -234,7 +238,8 @@ function modVal(array $data, string $key, string $default = ''): string {
                 </select>
                 <p style="margin : 5px"> x </p>
                 <input type="number" name="quantite" min="1" step="1" 
-                    placeholder="1" value="1">
+                    placeholder="1" value="1"
+                    required>
             </div>
             <button type="submit" name="add_ustensile" value=""
                 class="btn btn--ghost btn--add-row" formnovalidate>

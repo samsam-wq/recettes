@@ -187,14 +187,16 @@ function modVal(array $data, string $key, string $default = ''): string {
             <div class="row">
                 <label for="duree">Durée (minutes)</label>
                 <input type="number" id="duree" name="duree" min="1" max="600"
-                       value="<?= modVal($data, 'duree') ?>">
+                       value="<?= modVal($data, 'duree') ?>
+                       required">
             </div>
 
             <div class="row">
                 <label for="image">Image (URL)</label>
                 <input type="text" id="image" name="image"
                        placeholder="https://…"
-                       value="<?= modVal($data, 'image') ?>">
+                       value="<?= modVal($data, 'image') ?>
+                       required">
                 <?php if (!empty($recette['image'])): ?>
                 <div style="grid-column:2; margin-top:8px;">
                     <img src="<?= htmlspecialchars($recette['image']) ?>"
@@ -206,7 +208,8 @@ function modVal(array $data, string $key, string $default = ''): string {
             <div class="row">
                 <label for="duree">Note</label>
                 <input type="number" id="points" name="points" min="1" max="5"
-                       value="<?php echo isset($dataNote) ? modVal($dataNote, 'note') : 1 ?>">
+                       value="<?php echo isset($dataNote) ? modVal($dataNote, 'note') : 1 ?>
+                       required">
             </div>
         </div>
 

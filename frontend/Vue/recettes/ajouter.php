@@ -23,6 +23,9 @@ if (
     isset($_POST['categorie']) &&
     isset($_POST['image']) 
 ){
+    if ($_POST['image']===""){
+        $_POST['image']=$_POST['nom'].".jpg";
+    }
     $reponse = $recetteControleur->ajouterRecette(
         $_POST['nom'],
         $_POST['duree'],
@@ -112,14 +115,16 @@ function oldVal(array $old, string $key, string $default = ''): string {
                 <label for="duree">Durée (minutes)</label>
                 <input type="number" id="duree" name="duree" min="1" max="600"
                        placeholder="Ex : 45"
-                       value="<?= oldVal($old, 'duree') ?>">
+                       value="<?= oldVal($old, 'duree') ?> 
+                       required">
             </div>
 
             <div class="row">
                 <label for="image">Image (URL)</label>
                 <input type="text" id="image" name="image"
                        placeholder="https://…"
-                       value="<?= oldVal($old, 'image') ?>">
+                       value="<?= oldVal($old, 'image') ?>
+                       required">
             </div>
 
             <div class="row">

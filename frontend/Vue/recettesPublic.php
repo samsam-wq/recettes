@@ -79,6 +79,8 @@ if (isset($_GET['id'])){
                                 $utiliseControleur->ajouterUtilise($ingredient['Id_Ingredient'],$id,$etape['numero'],$ustensile['quantite']);
                             }
                         }
+
+                        $erreur = "Recette ajoutée avec succès";
                     }else{
                         $erreur = $reponse['status_message'];
                     }

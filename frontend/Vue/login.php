@@ -41,6 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"]) && isset($
                     placeholder="Ton identifiant"
                     value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>"
                     autocomplete="username"
+                    required
                 >
             </div>
 
@@ -52,6 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"]) && isset($
                     name="password"
                     placeholder="••••••••"
                     autocomplete="current-password"
+                    required
                 >
             </div>
 
