@@ -7,7 +7,7 @@ use frontend\Service\ApiService;
 class EtapeControleur {
     private static ?EtapeControleur $instance = null;
     private readonly ApiService $apiServide;
-    private string $url = "https://apirecettes.alwaysdata.net/Etape";
+    private string $url = "http://backend.test/Etape";
 
     private function __construct() {
         $this->apiServide = ApiService::getInstance();

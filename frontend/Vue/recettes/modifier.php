@@ -261,6 +261,9 @@ function modVal(array $data, string $key, string $default = ''): string {
                 </div>
                 <?php endforeach; ?>
                 <?php 
+                    if(!isset($idx)){
+                        $idx = 0;
+                    }
                     if(empty($etapes)){
                         $idNouvelleEtape = $idx+1;
                     }else{

@@ -7,7 +7,7 @@ use frontend\Service\ApiService;
 class NoterControleur {
     private static ?NoterControleur $instance = null;
     private readonly ApiService $apiServide;
-    private string $url = "https://apirecettes.alwaysdata.net/Note";
+    private string $url = "http://backend.test/Note";
 
     private function __construct() {
         $this->apiServide = ApiService::getInstance();

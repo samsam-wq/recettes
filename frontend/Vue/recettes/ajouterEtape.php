@@ -28,6 +28,9 @@ if (
         }elseif (isset($_POST['etape'])){
             header('Location: /recettes/ajouterEtape?id='.$_GET['id'].'&numero='.($_GET['numero']+1));
             exit();
+        }elseif (isset($_POST['modifierEtape'])){
+            header('Location: /recettes/modifierEtape?id='.$_GET['id'].'&numero='.($_GET['numero']));
+            exit();
         }
     }else{
         $erreurs[] = $reponse['status_message'];
@@ -94,6 +97,9 @@ function oldVal(array $old, string $key, string $default = ''): string {
             <a href="/recettes" class="btn btn--ghost">Annuler</a>
             <button type="submit" name="recette" value="1" class="btn btn--launch">
                 Retour à la recette
+            </button>
+            <button type="submit" name="modifierEtape" value="1" class="btn btn--launch">
+                Terminer l'étape
             </button>
             <button type="submit" name="etape" value="1" class="btn btn--launch">
                 Ajouter une autre étape

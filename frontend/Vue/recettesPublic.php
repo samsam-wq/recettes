@@ -7,8 +7,18 @@
  *   int    $total     — nombre total de résultats
  */
 use \frontend\Controleur\RecetteControleur;
+use \frontend\Controleur\EtapeControleur;
+use \frontend\Controleur\UstensileControleur;
+use \frontend\Controleur\IngredientControleur;
+use \frontend\Controleur\UtiliseControleur;
+use \frontend\Controleur\ContientControleur;
 
+$contientControleur = ContientControleur::getInstance();
+$utiliseControleur = UtiliseControleur::getInstance();
 $recetteControleur = RecetteControleur::getInstance();
+$etapeControleur = EtapeControleur::getInstance();
+$ustensileControleur = UstensileControleur::getInstance();
+$ingredientControleur = IngredientControleur::getInstance();
 
 $categorie = htmlspecialchars($_GET['categorie'] ?? '');
 $duree     = htmlspecialchars($_GET['duree']     ?? '');
@@ -27,13 +37,58 @@ if (isset($_GET['id'])){
     if ($reponse['status_code']==200) {
         $recette = $reponse['data'];
 
-        $recetteControleur->ajouterRecette(
+        $reponse = $recetteControleur->ajouterRecette(
             $recette['nom'],
             $recette['duree'],
             $recette['categorie'],
             $recette['image'],
             $_SESSION['groupe']
         );
+        if ($reponse['status_code']==201){
+            $id = $reponse['data'];
+
+            $reponse = $etapeControleur->lesEtapesDuPlat($_GET['id']);
+            if ($reponse['status_code']==200){
+                $etapes = $reponse['data'];
+
+                foreach($etapes as $etape){
+                    $reponse = $etapeControleur->ajouterEtape(
+                        $etape['titre'],
+                        $etape['contenu'],
+                        $etape['numero'],
+                        $id
+                    );
+
+                    if ($reponse['status_code']==201){
+                        $reponse = $ingredientControleur->tousLesIngredientDeEtape($_GET['id'],$etape['numero']);
+
+                        if ($reponse['status_code']==200){
+                            $ingredients = $reponse['data'];
+
+                            foreach($ingredients as $ingredient){
+                                $contientControleur->ajouterContient($ingredient['Id_Ingredient'],$id,$etape['numero'],$ingredient['quantite'],$ingredient['unite']);
+                            }
+                        }
+
+                        $reponse = $ustensileControleur->tousLesUstensileDeEtape($_GET['id'],$etape['numero']);
+
+                        if ($reponse['status_code']==200){
+                            $ustensiles = $reponse['data'];
+
+                            foreach($ustensiles as $ustensile){
+                                $utiliseControleur->ajouterUtilise($ingredient['Id_Ingredient'],$id,$etape['numero'],$ustensile['quantite']);
+                            }
+                        }
+                    }else{
+                        $erreur = $reponse['status_message'];
+                    }
+                }
+            }else{
+                $erreur = $reponse['status_message'];
+            }
+        }else{
+            $erreur = $reponse['status_message'];
+        }
     }
 }
 
@@ -72,49 +127,48 @@ function recetteFilterUrl(array $overrides = []): string {
 
         <?php if (!empty($recettes)): ?>
             <?php foreach ($recettes as $r): ?>
-            <article class="recipe-card">
-                <div class="card-image-wrap">
-                    <?php if (!empty($r['image'])): ?>
-                        <img src="<?= htmlspecialchars($r['image']) ?>"
-                             alt="<?= htmlspecialchars($r['nom']) ?>"
-                             class="card-image" loading="lazy">
-                    <?php else: ?>
-                        <div class="card-image card-image--placeholder">🍽️</div>
-                    <?php endif; ?>
+                <?php if ($r['groupe'] != $_SESSION['groupe']): ?>
+                    <article class="recipe-card">
+                        <div class="card-image-wrap">
+                            <?php if (!empty($r['image'])): ?>
+                                <img src="<?= htmlspecialchars($r['image']) ?>"
+                                    alt="<?= htmlspecialchars($r['nom']) ?>"
+                                    class="card-image" loading="lazy">
+                            <?php else: ?>
+                                <div class="card-image card-image--placeholder">🍽️</div>
+                            <?php endif; ?>
 
-                    <?php
-                    $catClass = match(strtolower($r['categorie'] ?? '')) {
-                        'plat', 'plat principal' => 'card-category--main',
-                        'végétarien', 'vegetarien' => 'card-category--veg',
-                        default => ''
-                    };
-                    ?>
-                    <span class="card-category <?= $catClass ?>">
-                        <?= htmlspecialchars($r['categorie'] ?? 'Autre') ?>
-                    </span>
-                </div>
+                            <?php
+                            $catClass = match(strtolower($r['categorie'] ?? '')) {
+                                'plat', 'plat principal' => 'card-category--main',
+                                'végétarien', 'vegetarien' => 'card-category--veg',
+                                default => ''
+                            };
+                            ?>
+                            <span class="card-category <?= $catClass ?>">
+                                <?= htmlspecialchars($r['categorie'] ?? 'Autre') ?>
+                            </span>
+                        </div>
 
-                <div class="card-body">
-                    <h3 class="card-title">
-                        <a href="./recettes/detail?id=<?= (int)$r['Id_recette'] ?>" class="card-title-link">
-                            <?= htmlspecialchars($r['nom']) ?>
-                        </a>
-                    </h3>
-                    <div class="card-meta">
-                        <?php if (!empty($r['duree'])): ?>
-                            <span class="meta-item">⏱ <?= htmlspecialchars($r['duree']) ?> min</span>
-                        <?php endif; ?>  
-                    </div>
-                    <div class="card-actions">
-                        <a href="./recettes/detail?id=<?= (int)$r['Id_recette'] ?>" class="card-btn card-btn--view">Voir</a>
-                        <?php if ($r['groupe'] != $_SESSION['groupe']): ?>
-                            <a href="./recettesPublic?id=<?= (int)$r['Id_recette'] ?>" class="card-btn card-btn--view">Ajouter</a>
-                        <?php endif; ?> 
-                    </div>
-                </div>
-            </article>
+                        <div class="card-body">
+                            <h3 class="card-title">
+                                <a href="./recettes/detail?id=<?= (int)$r['Id_recette'] ?>" class="card-title-link">
+                                    <?= htmlspecialchars($r['nom']) ?>
+                                </a>
+                            </h3>
+                            <div class="card-meta">
+                                <?php if (!empty($r['duree'])): ?>
+                                    <span class="meta-item">⏱ <?= htmlspecialchars($r['duree']) ?> min</span>
+                                <?php endif; ?>  
+                            </div>
+                            <div class="card-actions">
+                                <a href="./recettes/detail?id=<?= (int)$r['Id_recette'] ?>" class="card-btn card-btn--view">Voir</a>
+                                <a href="./recettesPublic?id=<?= (int)$r['Id_recette'] ?>" class="card-btn card-btn--view">Ajouter</a> 
+                            </div>
+                        </div>
+                    </article>
+                <?php endif; ?>
             <?php endforeach; ?>
-
 
         <?php else: ?>
         <div class="empty-state">
