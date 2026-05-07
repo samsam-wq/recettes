@@ -42,6 +42,9 @@ if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION
 
 <?php if ($_SERVER["REQUEST_URI"] !== '/login') : ?>
 
+<!-- Checkbox cachée pour contrôler le menu mobile (CSS pur, sans JS) -->
+<input type="checkbox" id="nav-toggle" aria-hidden="true">
+
 <header class="navbar">
     <div class="navbar-inner">
 
@@ -85,8 +88,53 @@ if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION
             </div>
         <?php endif; ?>
 
+        <!-- Bouton burger (mobile uniquement) -->
+        <label for="nav-toggle" class="nav-burger" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
+
     </div>
 </header>
+
+<!-- Overlay (ferme le menu au clic) -->
+<label for="nav-toggle" class="nav-overlay"></label>
+
+<!-- Panneau latéral mobile -->
+<nav class="nav-mobile-links" aria-label="Navigation mobile">
+    <div class="nav-mobile-header">
+        <span class="nav-mobile-title">🍳 Nos Recettes</span>
+        <label for="nav-toggle" class="nav-mobile-close" aria-label="Fermer">✕</label>
+    </div>
+
+    <div class="nav-mobile-group">
+        <span class="nav-mobile-group-title">Recettes</span>
+        <a href="/recettes">🍽️ Toutes mes Recettes</a>
+        <a href="/recettes/ajouter">➕ Ajouter une Recette</a>
+        <a href="/recettesPublic">🌍 Toutes les Recettes</a>
+    </div>
+
+    <div class="nav-mobile-group">
+        <span class="nav-mobile-group-title">Ingrédients</span>
+        <a href="/ingredients">🧂 Tous les Ingrédients</a>
+        <a href="/ingredients/ajouter">➕ Ajouter un Ingrédient</a>
+    </div>
+
+    <div class="nav-mobile-group">
+        <span class="nav-mobile-group-title">Ustensiles</span>
+        <a href="/ustensiles">🍴 Tous les Ustensiles</a>
+        <a href="/ustensiles/ajouter">➕ Ajouter un Ustensile</a>
+    </div>
+
+    <?php if (isset($_SESSION['login'])) : ?>
+    <div class="nav-mobile-group">
+        <span class="nav-mobile-group-title">👋 <?php echo htmlspecialchars($_SESSION['login']); ?></span>
+        <a href="/">Inviter / Rejoindre</a>
+        <a href="/">Déconnexion</a>
+    </div>
+    <?php endif; ?>
+</nav>
 
 <?php endif; ?>
 
