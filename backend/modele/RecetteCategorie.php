@@ -6,6 +6,8 @@ enum RecetteCategorie
     case DESSERT;
     case PLAT;
     case ENTREE;
+    case VEGETARIEN;
+    case AUTRE;
 
     public static function fromName(string $name): ?RecetteCategorie
     {

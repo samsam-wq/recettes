@@ -48,7 +48,7 @@
                     $apiService->deliverResponse(404, "Requete valide mais aucune donnée à récupérer");
                 }
             }//recherche
-            elseif(($id && !ctype_digit($id) && $id !=="all") || $duree || $recherche || $favori || $specialite){
+            elseif(($id && !ctype_digit($id) && $id !=="all"&& $id !=="categorie") || $duree || $recherche || $favori || $specialite){
                 $recettes = $recetteControleur->filtrerRecettes($groupe,$login,$id,$duree,$recherche,$favori,$specialite);
                 if ($recettes){
                     $recettes = $apiService->toArrayList($recettes);
@@ -66,7 +66,16 @@
                 }else{
                     $apiService->deliverResponse(404, "Requete valide mais aucune donnée à récupérer");
                 }
-            }//findAllGroup
+            }
+            //getCategorie
+            elseif($id && $id ==="categorie"){
+                $recetteCategories = RecetteCategorie::cases();
+                foreach($recetteCategories as $recetteCategorie){
+                    $recetteCategorieStr[]= $recetteCategorie->name;
+                }
+                $apiService->deliverResponse(200, "Donnée récupérée avec succès.",$recetteCategorieStr);
+            }
+            //findAllGroup
             else{
                 $recettes = $recetteControleur->toutesLesRecettesDuGroupe($groupe);
                 if ($recettes){
