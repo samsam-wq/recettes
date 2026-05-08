@@ -85,8 +85,8 @@ class RecetteControleur {
         return $this->apiServide->callApi($this->url,"GET",null,array($categorie,$duree,$recherche,$favori,$specialite));
     }
 
-    public function getRecetteAleatoire(){
-        return $this->laRecette(0);
+    public function getCategories(){
+        return $this->apiServide->callApi($this->url,"GET",null,array("categorie"));
     }
 
 }

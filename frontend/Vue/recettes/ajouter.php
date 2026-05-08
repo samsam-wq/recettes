@@ -57,6 +57,11 @@ if (
     }
 }
 
+$reponse = $recetteControleur->getCategories();
+if ($reponse['status_code']==200) {
+    $cats = $reponse['data'];
+}
+
 $old    = $old    ?? [];
 $erreurs = $erreurs ?? [];
 
@@ -103,7 +108,8 @@ function oldVal(array $old, string $key, string $default = ''): string {
                 <label for="categorie">Catégorie</label>
                 <select id="categorie" name="categorie">
                     <option value="">— Choisir —</option>
-                    <?php foreach (['Dessert', 'Plat', 'Végétarien', 'Entrée', 'Soupe', 'Autre'] as $c): ?>
+                    <?php foreach ($cats as $c): 
+                        $c = strtolower($c);?>
                     <option value="<?= $c ?>" <?= oldVal($old, 'categorie') === $c ? 'selected' : '' ?>>
                         <?= $c ?>
                     </option>
@@ -123,8 +129,7 @@ function oldVal(array $old, string $key, string $default = ''): string {
                 <label for="image">Image (URL)</label>
                 <input type="text" id="image" name="image"
                        placeholder="https://…"
-                       value="<?= oldVal($old, 'image') ?>
-                       required">
+                       value="<?= oldVal($old, 'image') ?>">
             </div>
 
             <div class="row">

@@ -117,6 +117,11 @@ if ($redirection && empty($erreurs)) {
     exit();
 }
 
+$reponse = $recetteControleur->getCategories();
+if ($reponse['status_code']==200) {
+    $cats = $reponse['data'];
+}
+
 $erreurs = $erreurs ?? [];
 // $old prend la priorité sur $recette pour re-peupler après une erreur de validation
 $data = array_merge($recette, $old ?? []);
@@ -176,7 +181,8 @@ function modVal(array $data, string $key, string $default = ''): string {
                 <label for="categorie">Catégorie</label>
                 <select id="categorie" name="categorie">
                     <option value="">— Choisir —</option>
-                    <?php foreach (['Dessert', 'Plat', 'Végétarien', 'Entree', 'Soupe', 'Autre'] as $c): ?>
+                    <?php foreach ($cats as $c): 
+                        $c = strtolower($c);?>
                     <option value="<?= $c ?>" <?= strtolower(modVal($data, 'categorie')) === strtolower($c) ? 'selected' : '' ?>>
                         <?= $c ?>
                     </option>
@@ -195,8 +201,8 @@ function modVal(array $data, string $key, string $default = ''): string {
                 <label for="image">Image (URL)</label>
                 <input type="text" id="image" name="image"
                        placeholder="https://…"
-                       value="<?= modVal($data, 'image') ?>
-                       required">
+                       value="<?= modVal($data, 'image') ?>"
+                       required>
                 <?php if (!empty($recette['image'])): ?>
                 <div style="grid-column:2; margin-top:8px;">
                     <img src="<?= htmlspecialchars($recette['image']) ?>"

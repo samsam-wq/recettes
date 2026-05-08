@@ -18,13 +18,10 @@ $q         = htmlspecialchars($_GET['q']         ?? '');
 $favoris   = isset($_GET['favoris']);
 $specialite=isset($_GET['specialite']);
 
-$cats = [
-    ''           => 'Toutes',
-    'dessert'=> '🍰 Dessert',
-    'plat'       => '🍽️ Plat principal',
-    'vegetarien' => '🥗 Végétarien',
-    'entree'     => '🥣 Entrée',
-];
+$reponse = $recetteControleur->getCategories();
+if ($reponse['status_code']==200) {
+    $cats = $reponse['data'];
+}
 
 if (isset($_GET['idFavori'])){
     $reponse = $noterControleur->mettreOuEnleverEnfavori($_GET['idFavori']);
@@ -114,12 +111,13 @@ function recetteFilterUrl(array $overrides = []): string {
             <fieldset class="filter-group">
                 <legend class="filter-label">Catégorie</legend>
                 <div class="filter-options">
-                    <?php foreach ($cats as $val => $label):
+                    <?php foreach ($cats as $val):
+                        $val = strtolower($val);
                         $active = ($categorie === $val) ? 'filter-option--active' : ''; ?>
                     <label class="filter-option <?= $active ?>">
                         <input type="radio" name="categorie" value="<?= $val ?>"
                                <?= ($categorie === $val) ? 'checked' : '' ?>>
-                        <span class="filter-pill"><?= $label ?></span>
+                        <span class="filter-pill"><?= $val ?></span>
                     </label>
                     <?php endforeach; ?>
                 </div>
