@@ -4,26 +4,17 @@ use frontend\Controleur\UtilisateurControleur;
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"]) && isset($_POST["password"])) {
     $controleur = UtilisateurControleur::getInstance();
 
-    $token = $controleur->seConnecter(trim($_POST["username"]), trim($_POST["password"]));
-    if ($token) {
-        $_SESSION['token'] = $token;
-        $_SESSION['groupe']  = $controleur->getGroupe($token);
-        $_SESSION['login'] = $controleur->getLogin($token);
-        if(isset($_POST['groupe'])){
-            $reponse = $controleur->modifierGroupe($_POST["username"],$_POST['password'],$_POST['groupe']);
-            if ($reponse['status_code']===200){
-                $_SESSION['groupe']=$reponse['data'];
-                header("Location: /recettes");
-                exit();
-            } else {
-                $erreur = "Nom d'utilisateur ou mot de passe incorrect.";
-            }
-        }else{
-            header("Location: /recettes");
+    if ($_POST["password"]===$_POST["confirmPassword"]){
+        $reponse = $controleur->ajouterUtilisateur($_POST["username"],$_POST["confirmPassword"]);
+
+        if ($reponse['status_code']===201){
+            header("Location: login");
             exit();
+        }else{
+            $erreur=$reponse['status_message'];
         }
-    } else {
-        $erreur = "Nom d'utilisateur ou mot de passe incorrect.";
+    }else{
+        $erreur="Les mots de passe ne correspondent pas ";
     }
 }
 ?>
@@ -36,16 +27,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"]) && isset($
             Nos Recettes
         </h1>
         <p style="color:var(--clr-text-muted); font-size:.92rem; margin-top:6px;">
-            Connecte-toi pour accéder à tes recettes
+            Identifie toi pour accéder à tes recettes
         </p>
     </div>
 
     <div class="container">
-        <form action="/login" method="POST">
-        <?php if(isset($_GET['groupe'])): ?>
-            <input type="hidden" name="groupe" value="<?= $_GET['groupe'] ?>">
-        <?php endif;?>
-            
+        <form action="/signin" method="POST">
 
             <div class="row">
                 <label for="username">Utilisateur</label>
@@ -72,12 +59,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"]) && isset($
                 >
             </div>
 
-            <div class="row row--action">
-                <input type="submit" name="connecter" value="Se connecter" class="largeSubmit">
+            <div class="row">
+                <label for="password">Confimer Mot de passe</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="confirmPassword"
+                    placeholder="••••••••"
+                    required
+                >
             </div>
 
             <div class="row row--action">
-                <a href="./signin"><p>Pas de compte ? S'identifier</p></a>
+                <input type="submit" name="connecter" value="S'identifier" class="largeSubmit">
             </div>
 
         </form>

@@ -58,6 +58,9 @@ class ApiService
                 break;
             case "DELETE":
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+                if ($payload){
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+                }
                 break;
             case "PUT":
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");

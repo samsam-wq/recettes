@@ -26,7 +26,7 @@ class UtilisateurControleur {
             "password" => $password
         ];
 
-        $responseData = $this->apiservice->callApi($this->url,"POST",$payload);
+        $responseData = $this->apiservice->callApi($this->url,"POST",$payload,array("connexion"));
 
         if ($responseData['status_code'] != 200) {
             return false;
@@ -74,5 +74,50 @@ class UtilisateurControleur {
         $payloadData = json_decode($payload);
 
         return $payloadData->login ?? null;
+    }
+
+    public function ajouterUtilisateur(
+            string $login,
+            string $motDePasse
+        ){
+        $payload = [
+            "login" => $login,
+            "password" => $motDePasse
+        ];
+        return $this->apiservice->callApi($this->url,"POST",$payload,array("inscription"));
+    }
+
+    public function modifierMdp(
+        string $login,
+        string $motDePasse,
+        string $nvMdp
+    ){
+        $payload = [
+            "password" => $motDePasse,
+            "newPassword" => $nvMdp
+        ];
+        return $this->apiservice->callApi($this->url,"PATCH",$payload,array($login));
+    }
+
+    public function modifierGroupe(
+        string $login,
+        string $motDePasse,
+        string $nvGrp
+    ){
+        $payload = [
+            "password" => $motDePasse,
+            "newGroupe" => $nvGrp
+        ];
+        return $this->apiservice->callApi($this->url,"PATCH",$payload,array($login));
+    }
+
+    public function supprimerUtilisateur(
+        string $login,
+        string $motDePasse
+    ):array{
+        $payload = [
+            "password" => $motDePasse
+        ];
+        return $this->apiservice->callApi($this->url,"DELETE",$payload,array($login));
     }
 }

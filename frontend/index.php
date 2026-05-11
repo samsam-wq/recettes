@@ -17,11 +17,11 @@ if (preg_match('/\.(?:png|jpg|jpeg|gif|ico|css|js)\??.*$/', $_SERVER["REQUEST_UR
 
 session_start();
 
-if ($_SERVER["REQUEST_URI"] !== "/login" && !isset($_SESSION['token'])) {
+if (($_SERVER["REQUEST_URI"] !== "/login" && $_SERVER["REQUEST_URI"] !== "/signin") && !isset($_SESSION['token'])) {
     header('Location: /login');
     exit();
 }
-if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION['token'])) {
+if (($_SERVER["REQUEST_URI"] !== "/login" && $_SERVER["REQUEST_URI"] !== "/signin") && !$apiservice->isTokenValid($_SESSION['token'])) {
     header('Location: /login');
     exit();
 }
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION
 </head>
 <body>
 
-<?php if ($_SERVER["REQUEST_URI"] !== '/login') : ?>
+<?php if ( !str_contains($_SERVER["REQUEST_URI"],'/login')  && $_SERVER["REQUEST_URI"] !== '/signin') : ?>
 
 <!-- Checkbox cachée pour contrôler le menu mobile (CSS pur, sans JS) -->
 <input type="checkbox" id="nav-toggle" aria-hidden="true">
@@ -82,8 +82,7 @@ if ($_SERVER["REQUEST_URI"] !== "/login" && !$apiservice->isTokenValid($_SESSION
             <div class="nav-cta dropdown">
                 <button class="dropbtn">👋 <?php echo htmlspecialchars($_SESSION['login']); ?></button>
                 <div class="dropdown-content">
-                    <a href="/">Inviter/Rejoindre</a>
-                    <a href="/">Déconnexion</a>
+                    <a href="/compte">Mon Compte</a>
                 </div>
             </div>
         <?php endif; ?>
