@@ -36,17 +36,17 @@ $redirection = false;
 if (isset($_POST['remove_etape'])){//supprime etape
     $reponse = $utiliseControleur->supprimerUtiliseEtape($_POST['id'],$_POST['remove_etape']);
     if ($reponse['status_code'] !== 200){
-        $erreurs[] = $reponse['status_message'];
+        $erreurs[] = $reponse['status_message']."1";
     }
 
     $reponse = $contientControleur->supprimerContientEtape($_POST['id'],$_POST['remove_etape']);
     if ($reponse['status_code'] !== 200){
-        $erreurs[] = $reponse['status_message'];
+        $erreurs[] = $reponse['status_message']."2";
     }
 
     $reponse = $etapeControleur->supprimerEtape($_POST['id'],$_POST['remove_etape']);
     if ($reponse['status_code'] !== 200){
-        $erreurs[] = $reponse['status_message'];
+        $erreurs[] = $reponse['status_message']."3";
     }
 }
 
@@ -76,7 +76,7 @@ if (
     if ($reponse['status_code'] === 200){
         $redirection = true;
     }else{
-        $erreurs[] = $reponse['status_message'];
+        $erreurs[] = $reponse['status_message']."4";
         $old['nom'] = $_POST['nom'];
         $old['duree'] =$_POST['duree'];
         $old['categorie'] = $_POST['categorie'];
@@ -89,8 +89,18 @@ if (isset($_POST['id']) && isset($_POST['points'])) {//modifie les points
     if ($reponse['status_code'] === 200){
         $redirection = true;
     }else{
-        $erreurs[] = $reponse['status_message'];
-        $oldNote['points'] = $_POST['points'];
+        if ($reponse['status_code'] === 404){
+            $reponse = $noterControleur->ajouterNote($_POST['id'],$_POST['points'],false,false);
+            if ($reponse['status_code'] === 201){
+                $redirection = true;
+            }else{
+                $erreurs[] = $reponse['status_message'].$reponse['status_code'];
+                $oldNote['points'] = $_POST['points'];
+            }
+        }else{
+            $erreurs[] = $reponse['status_message'].$reponse['status_code'];
+            $oldNote['points'] = $_POST['points'];
+        }
     }
 }
 
@@ -114,7 +124,7 @@ if ($reponse['status_code']==200) {
 }
 
 if ($redirection && empty($erreurs)) {
-    header('Location: /recettes');
+    header('Location: /recettes/detail?id='.$_GET['id']);
     exit();
 }
 
@@ -297,7 +307,7 @@ function modVal(array $data, string $key, string $default = ''): string {
 
         <!-- ── Soumission ─────────────────────────────────────── -->
         <div class="form-submit-row">
-            <a href="/recettes?id=<?= $id ?>" class="btn btn--ghost">Annuler</a>
+            <a href="/recettes/detail?id=<?= $id ?>" class="btn btn--ghost">Annuler</a>
             <button type="submit" name="save" value="1" class="btn btn--launch">
                 💾 Enregistrer les modifications
             </button>
