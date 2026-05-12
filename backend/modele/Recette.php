@@ -8,6 +8,7 @@
         private int $Id_recette;
         private string $nom;
         private int $duree;
+        private int $personne;
         private RecetteCategorie $categorie;
         private string $image;
         private int $groupe;
@@ -17,6 +18,7 @@
             int $Id_recette,
             string $nom,
             int $duree,
+            int $personne,
             RecetteCategorie $categorie,
             string $image,
             int $groupe)
@@ -24,6 +26,7 @@
             $this->Id_recette=$Id_recette;
             $this->nom=$nom;
             $this->duree=$duree;
+            $this->personne=$personne;
             $this->categorie=$categorie;
             $this->image=$image;
             $this->groupe=$groupe;
@@ -39,6 +42,7 @@
                 'Id_recette' => $this->getIdRecette() ,
                 'nom' => $this->getNom() ,
                 'duree' => $this->getDuree() ,
+                'personne' => $this->getPersonne() ,
                 'categorie' => $this->getCategorie()->name ,
                 'image' => $this->getImage() ,
                 'groupe' => $this->getGroupe() ,
@@ -54,6 +58,9 @@
         }
         public function getDuree():int{
             return $this->duree ;
+        }
+        public function getPersonne():int{
+            return $this->personne ;
         }
         public function getCategorie():RecetteCategorie{
             return $this->categorie ;
@@ -76,6 +83,9 @@
         }
         public function setDuree(int $duree):void{
             $this->duree=$duree;
+        }
+        public function setPersonne(int $personne):void{
+            $this->personne=$personne;
         }
         public function setCategorie(RecetteCategorie $categorie):void{
             $this->categorie=$categorie;

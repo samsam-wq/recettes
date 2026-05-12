@@ -75,6 +75,7 @@ $id        = (int) $recette['Id_recette'];
 $nom       = htmlspecialchars($recette['nom']         ?? '');
 $categorie = htmlspecialchars($recette['categorie']   ?? '');
 $duree     = htmlspecialchars($recette['duree']       ?? '');
+$personne  = htmlspecialchars($recette['personne']    ?? '');
 $image     = htmlspecialchars($recette['image']       ?? '');
 $favori    = ( $recette['notes']!==null && !empty($recette['notes']['favori']));
 $specialite    = ( $recette['notes']!==null && !empty($recette['notes']['specialite']));
@@ -124,6 +125,13 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
                     <span class="detail-meta-icon">⏱</span>
                     <span class="detail-meta-value"><?= $duree ?> min</span>
                     <span class="detail-meta-label">Durée</span>
+                </div>
+                <?php endif; ?>
+                <?php if ($personne): ?>
+                <div class="detail-meta-card">
+                    <span class="detail-meta-icon">👤</span>
+                    <span class="detail-meta-value" id="personneBase"><?= $personne ?></span>
+                    <span class="detail-meta-label">personne(s)</span>
                 </div>
                 <?php endif; ?>
                 <?php if (!empty($etapes)): ?>
@@ -187,13 +195,19 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
         <?php if (!empty($ingredients)): ?>
         <aside class="detail-ingredients">
             <h2 class="detail-section-title">🧂 Ingrédients</h2>
+            <p id="test">Pour :</p>
+            <div class="number-input-wrap" style="display:flex">
+                <button type="button" class="number-btn" >−</button>
+                <input type="number" id="personnes" name="personnes" min="1" max="99" readonly>
+                <button type="button" class="number-btn">+</button>
+            </div>
             <ul class="ingredients-list">
                 <?php foreach ($ingredients as $ing): ?>
-                <li class="ingredient-item">
+                <li class="ingredient-item" >
                     <span class="ingredient-name"><?= htmlspecialchars($ing['nom'] ?? '') ?></span>
-                    <span class="ingredient-qty">
-                        <?= htmlspecialchars($ing['quantite'] ?? '') ?>
-                        <?= htmlspecialchars($ing['unite']    ?? '') ?>
+                    <span class="ingredient-qty"
+                        data-base="<?= htmlspecialchars($ing['quantite'] ?? '') ?>"
+                        data-unite="<?= htmlspecialchars($ing['unite']    ?? '') ?>">
                     </span>
                 </li>
                 <?php endforeach; ?>
@@ -243,5 +257,6 @@ $catClass = match(strtolower($recette['categorie'] ?? '')) {
         <?php endif; ?>
 
     </div><!-- /.detail-body -->
-
+    
 </div><!-- /.detail-page -->
+<script src="/scriptDetail.js"></script>

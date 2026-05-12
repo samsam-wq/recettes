@@ -23,6 +23,7 @@ class RecetteControleur {
     public function ajouterRecette(
         string $nom,
         int $duree,
+        int $personne,
         string $categorie,
         string $image,
         int $groupe
@@ -30,6 +31,7 @@ class RecetteControleur {
         $payload = [
             "nom" => $nom,
             "duree" => $duree,
+            "personne" => $personne,
             "categorie" => $categorie,
             "image" => $image,
             "groupe" => $groupe
@@ -59,6 +61,7 @@ class RecetteControleur {
         int $Id_recette,
         string $nom,
         int $duree,
+        int $personne,
         string $categorie,
         string $image,
         int $groupe
@@ -66,6 +69,7 @@ class RecetteControleur {
         $payload = [
             "nom" => $nom,
             "duree" => $duree,
+            "personne" => $personne,
             "categorie" => $categorie,
             "image" => $image,
             "groupe" => $groupe

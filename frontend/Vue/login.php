@@ -13,8 +13,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"]) && isset($
             $reponse = $controleur->modifierGroupe($_POST["username"],$_POST['password'],$_POST['groupe']);
             if ($reponse['status_code']===200){
                 $_SESSION['groupe']=$reponse['data'];
-                header("Location: /recettes");
-                exit();
+
+                $token = $controleur->seConnecter($login,$_POST['mdp_quitter']);
+                if ($token) {
+                    $_SESSION['token'] = $token;
+                    $_SESSION['groupe']  = $controleur->getGroupe($token);
+                    $_SESSION['login'] = $controleur->getLogin($token);
+
+                    header("Location: /recettes");
+                    exit();
+                }
             } else {
                 $erreur = "Nom d'utilisateur ou mot de passe incorrect.";
             }

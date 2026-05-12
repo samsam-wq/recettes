@@ -1,6 +1,6 @@
-create database Recettes;
+create database recettes;
 
-use Recettes;
+use recettes;
 
 drop table if exists Utilise;
 drop table if exists Utilise_R;
@@ -28,6 +28,7 @@ CREATE TABLE Recette(
    Id_Recette INT AUTO_INCREMENT,
    nom VARCHAR(50) ,
    duree INT,
+   personne INT,
    categorie VARCHAR(50) ,
    image VARCHAR(250) ,
    groupe INT ,
@@ -121,13 +122,13 @@ INSERT INTO Ingredient (nom) VALUES
 -- ---------------------------------------------
 -- Recettes
 -- ---------------------------------------------
-INSERT INTO Recette (nom, duree, categorie, image, groupe) VALUES
-    ('Poulet rôti aux herbes',     60,  'Plat', 'https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54.jpg.webp',     1),
-    ('Quiche lorraine',            50,  'Entree',         'quiche.jpg',          1),
-    ('Pâtes carbonara',            20,  'Plat', 'carbonara.jpg',       1),
-    ('Saumon citron-crème',        25,  'Plat', 'saumon.jpg',          1),
-    ('Ratatouille',                45,  'Plat', 'ratatouille.jpg',     1),
-    ('Omelette aux champignons',   15,  'Plat', 'omelette.jpg',        2);
+INSERT INTO Recette (nom, duree, personne, categorie, image, groupe) VALUES
+    ('Poulet rôti aux herbes',     60,2,  'Plat', 'https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54.jpg.webp',     1),
+    ('Quiche lorraine',            50,2,  'Entree',         'quiche.jpg',          1),
+    ('Pâtes carbonara',            20,2,  'Plat', 'carbonara.jpg',       1),
+    ('Saumon citron-crème',        25,2,  'Plat', 'saumon.jpg',          1),
+    ('Ratatouille',                45,2,  'Plat', 'ratatouille.jpg',     1),
+    ('Omelette aux champignons',   15,2,  'Plat', 'omelette.jpg',        2);
 
 -- ---------------------------------------------
 -- Etapes

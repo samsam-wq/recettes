@@ -165,8 +165,8 @@ function modVal(array $data, string $key, string $default = ''): string {
                 <div class="dynamic-row-inputs dynamic-row-inputs--etape">
                     <input type="text" name="titre"
                            placeholder="Titre de l'étape"
-                           value="<?= modVal($data, 'titre') ?>
-                           required">
+                           value="<?= modVal($data, 'titre') ?>"
+                           required>
                     <textarea name="contenu"
                               placeholder="Description détaillée de cette étape…"
                               required><?= modVal($data, 'contenu') ?></textarea>

@@ -28,11 +28,12 @@ class RecetteControleur {
     public function ajouterRecette(
         string $nom,
         int $duree,
+        int $personne,
         RecetteCategorie $categorie,
         string $image,
         int $groupe
     ):string|bool{
-        return $this->recettes->insert(new Recette(0,$nom,$duree,$categorie,$image,$groupe)); 
+        return $this->recettes->insert(new Recette(0,$nom,$duree,$personne,$categorie,$image,$groupe)); 
     }
 
     public function supprimerRecette(int $id):bool{
@@ -55,11 +56,12 @@ class RecetteControleur {
         int $Id_recette,
         string $nom,
         int $duree,
+        int $personne,
         RecetteCategorie $categorie,
         string $image,
         int $groupe
     ):bool{
-        return $this->recettes->update(new Recette($Id_recette,$nom,$duree,$categorie,$image,$groupe));
+        return $this->recettes->update(new Recette($Id_recette,$nom,$duree,$personne,$categorie,$image,$groupe));
     }
 
     public function filtrerRecettes(

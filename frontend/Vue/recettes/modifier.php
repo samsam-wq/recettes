@@ -68,6 +68,7 @@ if (
         $_POST['id'],
         $_POST['nom'],
         $_POST['duree'],
+        $_POST['personne'],
         $_POST['categorie'],
         $_POST['image'],
         $_SESSION['groupe']
@@ -193,8 +194,15 @@ function modVal(array $data, string $key, string $default = ''): string {
             <div class="row">
                 <label for="duree">Durée (minutes)</label>
                 <input type="number" id="duree" name="duree" min="1" max="600"
-                       value="<?= modVal($data, 'duree') ?>
-                       required">
+                       value="<?= modVal($data, 'duree') ?>"
+                       required>
+            </div>
+
+            <div class="row">
+                <label for="personne">Personne(s)</label>
+                <input type="number" id="personne" name="personne" min="1" max="10"
+                       value="<?= modVal($data, 'personne') ?>"
+                       required>
             </div>
 
             <div class="row">
@@ -214,8 +222,8 @@ function modVal(array $data, string $key, string $default = ''): string {
             <div class="row">
                 <label for="duree">Note</label>
                 <input type="number" id="points" name="points" min="1" max="5"
-                       value="<?php echo isset($dataNote) ? modVal($dataNote, 'note') : 1 ?>
-                       required">
+                       value="<?php echo isset($dataNote) ? modVal($dataNote, 'note') : 1 ?>"
+                       required>
             </div>
         </div>
 

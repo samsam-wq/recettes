@@ -40,6 +40,7 @@ if (isset($_GET['id'])){
         $reponse = $recetteControleur->ajouterRecette(
             $recette['nom'],
             $recette['duree'],
+            $recette['personne'],
             $recette['categorie'],
             $recette['image'],
             $_SESSION['groupe']

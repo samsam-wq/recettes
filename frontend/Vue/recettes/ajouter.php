@@ -20,6 +20,7 @@ $redirection = false;
 if (
     isset($_POST['nom']) && 
     isset($_POST['duree']) && 
+    isset($_POST['personne']) && 
     isset($_POST['categorie']) &&
     isset($_POST['image']) 
 ){
@@ -29,6 +30,7 @@ if (
     $reponse = $recetteControleur->ajouterRecette(
         $_POST['nom'],
         $_POST['duree'],
+        $_POST['personne'],
         $_POST['categorie'],
         $_POST['image'],
         $_SESSION['groupe']
@@ -52,6 +54,7 @@ if (
         $erreurs[] = $reponse['status_message'];
         $old['nom'] = $_POST['nom'];
         $old['duree'] =$_POST['duree'];
+        $old['personne'] =$_POST['personne'];
         $old['categorie'] = $_POST['categorie'];
         $old['image'] = $_POST['image'];
     }
@@ -126,11 +129,19 @@ function oldVal(array $old, string $key, string $default = ''): string {
             </div>
 
             <div class="row">
+                <label for="personne">Personne(s)</label>
+                <input type="number" id="personne" name="personne" min="1" max="10"
+                       value="<?= oldVal($old, 'personne') ?>"
+                       required>
+            </div>
+
+            <div class="row">
                 <label for="image">Image (URL)</label>
                 <input type="text" id="image" name="image"
                        placeholder="https://…"
                        value="<?= oldVal($old, 'image') ?>">
             </div>
+            
 
             <div class="row">
                 <label for="duree">Note</label>

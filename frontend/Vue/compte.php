@@ -20,8 +20,6 @@ use frontend\Controleur\UtilisateurControleur;
 
 $controleur = UtilisateurControleur::getInstance();
 
-$lien = "http://frontend.test/login?groupe=".$groupe_code;
-
 if (isset($_POST['modifierPassword'])) {
     if (trim($_POST["mdp_nouveau"])===trim($_POST["mdp_confirm"])) {
         $reponse = $controleur->modifierMdp($login,trim($_POST["mdp_actuel"]),trim($_POST["mdp_nouveau"]));
@@ -53,10 +51,19 @@ if (isset($_POST['modifierPassword'])) {
         $succes = $reponse['status_message'];
         $_SESSION['groupe']=$reponse['data'];
         $groupe_code    = htmlspecialchars($_SESSION['groupe'] ?? '');
+
+        $token = $controleur->seConnecter($login,$_POST['mdp_quitter']);
+        if ($token) {
+            $_SESSION['token'] = $token;
+            $_SESSION['groupe']  = $controleur->getGroupe($token);
+            $_SESSION['login'] = $controleur->getLogin($token);
+        }
     }else{
         $erreur = $reponse['status_message'];
     }
 }
+
+$lien = "http://frontend.test/login?groupe=".$groupe_code;
 ?>
 
 <div class="compte-page">

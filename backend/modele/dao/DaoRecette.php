@@ -52,16 +52,18 @@
         }
 
         public function insert($donnee): string|bool {
-            $req = $this->connexion->prepare('INSERT INTO Recette (nom, duree, categorie, image, groupe) VALUES (:nom, :duree, :categorie, :image, :groupe);');
+            $req = $this->connexion->prepare('INSERT INTO Recette (nom, duree,personne, categorie, image, groupe) VALUES (:nom, :duree,:personne, :categorie, :image, :groupe);');
             
             $nom = $donnee->getNom();
             $duree = $donnee->getDuree();
+            $personne = $donnee->getPersonne();
             $categorie = $donnee->getCategorie()->name;
             $image = $donnee->getImage();
             $groupe = $donnee->getGroupe();
             
             $req->bindParam(':nom', $nom);
             $req->bindParam(':duree', $duree);
+            $req->bindParam(':personne', $personne);
             $req->bindParam(':categorie', $categorie);
             $req->bindParam(':image', $image);
             $req->bindParam(':groupe', $groupe);
@@ -72,22 +74,24 @@
 
         public function update($donnee):bool{
             $req = $this->connexion->prepare('UPDATE Recette 
-                SET nom=:nom, duree=:duree, categorie=:categorie, image=:image, groupe=:groupe
+                SET nom=:nom, duree=:duree, personne=:personne, categorie=:categorie, image=:image, groupe=:groupe
                 where Id_Recette = :id;');
 
-            $id = $donnee->getIdRecette();
             $nom = $donnee->getNom();
             $duree = $donnee->getDuree();
+            $personne = $donnee->getPersonne();
             $categorie = $donnee->getCategorie()->name;
             $image = $donnee->getImage();
             $groupe = $donnee->getGroupe();
+            $id = $donnee->getIdRecette();
             
-            $req->bindParam(':id',$id);
             $req->bindParam(':nom', $nom);
             $req->bindParam(':duree', $duree);
+            $req->bindParam(':personne', $personne);
             $req->bindParam(':categorie', $categorie);
             $req->bindParam(':image', $image);
             $req->bindParam(':groupe', $groupe);
+            $req->bindParam(':id', $id);
 
             return $req->execute();
         }
@@ -105,10 +109,11 @@
             $Id_recette = $raw['Id_Recette'];
             $nom = $raw['nom'];
             $duree = $raw['duree'];
+            $personne = $raw['personne'];
             $categorie = RecetteCategorie::fromName(strtoupper($raw['categorie']));
             $image = $raw['image'];
             $groupe = $raw['groupe'];
-            $recette = new Recette($Id_recette,$nom,$duree,$categorie,$image,$groupe);
+            $recette = new Recette($Id_recette,$nom,$duree,$personne,$categorie,$image,$groupe);
             return $recette;
         }
     }

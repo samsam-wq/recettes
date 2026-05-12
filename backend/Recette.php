@@ -100,10 +100,11 @@
             }
             $champsManquants = [];
             if (empty($data['nom'])) $champsManquants[] = 'nom';
-            if (empty($data['duree'])) $champsManquants[] = 'prenom';
-            if (empty($data['categorie'])) $champsManquants[] = 'numeroDeLicence';
-            if (empty($data['image'])) $champsManquants[] = 'dateDeNaissance';
-            if (empty($data['groupe'])) $champsManquants[] = 'tailleEnCm'; 
+            if (empty($data['duree'])) $champsManquants[] = 'duree';
+            if (empty($data['personne'])) $champsManquants[] = 'personne';
+            if (empty($data['categorie'])) $champsManquants[] = 'categorie';
+            if (empty($data['image'])) $champsManquants[] = 'image';
+            if (empty($data['groupe'])) $champsManquants[] = 'groupe'; 
             if (!empty($champsManquants)) {
                 $message = "champs " . implode(', ',  $champsManquants) . " absent(s).";
                 $apiService->deliverResponse(400, $message);
@@ -115,6 +116,7 @@
             $id = $recetteControleur->ajouterRecette(
                 $data['nom'],
                 $data['duree'],
+                $data['personne'],
                 RecetteCategorie::fromName($data['categorie']),
                 $data['image'],
                 $data['groupe']
@@ -162,6 +164,7 @@
             $champsManquants = [];
             if (empty($data['nom'])) $champsManquants[] = 'nom';
             if (empty($data['duree'])) $champsManquants[] = 'duree';
+            if (empty($data['personne'])) $champsManquants[] = 'personne';
             if (empty($data['categorie'])) $champsManquants[] = 'categorie';
             if (empty($data['image'])) $champsManquants[] = 'image';
             if (empty($data['groupe'])) $champsManquants[] = 'groupe'; 
@@ -183,6 +186,7 @@
                     $id,
                     $data['nom'],
                     $data['duree'],
+                    $data['personne'],
                     RecetteCategorie::fromName($data['categorie']),
                     $data['image'],
                     $data['groupe']
